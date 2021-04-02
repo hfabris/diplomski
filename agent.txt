@@ -1,0 +1,51 @@
+{
+	"gray_agent" :
+	{
+		"actions"	:	[
+			"reboot_host",
+			"user_login_to_host",
+			"Opening a network connection between two hosts",
+			"Closing a network connection between two hosts",
+			"open email"
+			],
+		"strategy"	:	"Random",
+		"knowledge"	:	"domain",
+		"tools"	:	[]
+	},
+	"attacker" :
+	{
+		"actions"	:	[
+			"lateral movement",
+			"dump credentials",
+			"enumerate host",
+			"exfiltrate data",
+			"run exploit",
+			"escalate privileges",
+			"defense evasion",
+			"account discovery",
+			"initial access"
+			],
+		"strategy"	:	"Random",
+		"knowledge"	:	"",
+		"tools"		:	[
+			"CVE-2018-1111",
+			"CVE-2019-0211"
+			]
+	},
+	"defender" :
+	{
+		"actions"	:	[
+			"connection analysis",
+			"delete account",
+			"log analysis",
+			"add firewall rules"
+			],
+		"strategy"	:	"Random",
+		"knowledge"	:	"system",
+		"tools"		:	[
+			"admin password"
+			]
+	}
+	
+	
+}

@@ -1,0 +1,144 @@
+{
+	"reboot_host" :
+	{
+		"preconditions"	:	[
+			"has access"
+			],
+		"postconditions"	:	[
+			"flush credentials"
+			],
+		"success probability"	: 	"1"	
+	},
+	"Logging a user into a host":
+	{
+		"preconditions"	:	[
+			"not logged in",
+			"has authorization",
+			"correct credentials"
+			],
+		"postconditions"	:	[
+			"store credentials"
+			],
+		"success probability" : "1"
+	
+	},
+	"Opening a network connection between two hosts":
+	{
+		"preconditions"	:	[
+			"access to one host",
+			"connection authorized",
+			"host 2 logged in"
+			],
+		"postconditions"	:	[
+			"open connection",
+			"data exchange"
+			],
+		"success probability" : "0.75"	
+	
+	},
+	"Closing a network connection between two hosts":
+	{
+		"preconditions"	:	[
+			"connection open",
+			"access to one host"
+			],
+		"postconditions"	:	[
+			"connection closed"
+			],
+		"success probability" : "0.75"
+	
+	},
+	"lateral movement":
+	{
+		"preconditions"	:	[
+			"have foothold",
+			"knows connected",
+			"knows credentials",
+			"not have foothold",	
+			"remote login authorized"	
+			],
+		"postconditions"	:	[
+			"have foothold",
+			"connection open"	
+			],
+		"success probability" : "0.8"
+	
+	},
+	"dump credentials":
+	{
+		"preconditions"	:	[
+			"have escalated foothold"
+			],
+		"postconditions"	:	[
+			"credentials stored on host"
+			],
+		"success probability" : "0.9"
+	
+	},
+	"enumerate host":
+	{
+		"preconditions"	:	[
+			"escalated foothold",
+			"not enumerated"
+			],
+		"postconditions"	:	[
+			"host enumerated",
+			"connected components",
+			"active connections"
+			],
+		"success probability" : "0.9"
+	
+	},
+	"exfiltrate data" :
+	{
+		"preconditions"	:	[
+			"escalated foothold",
+			"host enumerated",
+			"not exfiltrated"
+			],
+		"postconditions"	:	[
+			"host exfiltrated",
+			"data captured"
+			],
+		"success probability" : "0.7"
+	
+	},
+	"run exploit":
+	{
+		"preconditions"	:	[
+			"have foothold",
+			"not tried exploit host", 
+			"knows connected",	
+			"not have foothold",	
+			"has exploit"
+			],
+		"postconditions"	:	[
+			"foothold if vulnerable"	
+			],
+		"success probability" : "0.5"
+	
+	},
+	"connection analysis":
+	{
+		"preconditions"	:	[
+			"connection exists",
+			"system account"
+			],
+		"postconditions"	:	[
+			"connection info"	
+			],
+		"success probability" : "1"
+	
+	},
+	"" :
+	{
+		"preconditions"	:	[
+			
+			],
+		"postconditions"	:	[
+			
+			],
+		"success probability" : ""
+	
+	}
+}

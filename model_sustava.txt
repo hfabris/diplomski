@@ -1,0 +1,282 @@
+{
+	"user_components" : 
+		{ 
+			"component" : {	
+				"name" : "accountant_workstation",
+				"connected_components" : [ "access_switch_accounting" ],
+				"ip_address" : "192.168.53.11",
+				"software" : [
+						"Operacijski sustav Windows 10 v1703",
+						"Microsoft office 2016",
+						"Microsoft Edge v40"
+						],
+				"accounts" : [ "user_account" ],
+				"domain"	: ""	
+			},
+			"component2" :{
+				"name" : "manager_workstation",
+				"connected_components" : [ "access_switch_management" ],
+				"ip_address" : "192.168.53.21",
+				"software" : [
+						"Operacijski sustav Windows 7 Service Pack 1 v6.1",
+						"Microsoft office 2016",
+						"Microsoft Edge v40"
+						],
+				"accounts" : [ 
+						"user_account", 
+						"administrator_account" 
+						],
+				"domain"	:	""
+			},
+			"component3" :{
+				"name"	:	"developer_workstation",
+				"connected_components"	:	[ "access_switch_IT" ],
+				"ip_address"	:	"192.168.53.31",
+				"software"	:	[
+						"Operacijski sustav Windows 10 v1703",
+						"Microsoft office 2016",
+						"Microsoft Edge v40",
+						"Visual studio 2015",
+						"Python 3.6"
+						],
+				"accounts"	: [ "user_account" ],
+				"domain"	:""
+			},
+			"component4" :{
+				"name"	:	"admin_workstation",
+				"connected_components"	:	[ "access_switch_IT" ],
+				"ip_address"	:	"192.168.53.41",
+				"software"	:	[
+						"Operacijski sustav Windows 10 v1703",
+						"Microsoft office 2016",
+						"Microsoft Edge v40"
+						],
+				"accounts"	:	[
+						"user_account",
+						"administrator_account"
+						],
+				"domain"	:""
+			},
+			"component5" :{
+				"name"	:	"sec_op_workstation",
+				"connected_components"	:	[ "access_switch_IT" ],
+				"ip_address"	: "192.168.53.46",
+				"software"	: [
+						"Operacijski sustav Windows 10 v1703",
+						"Microsoft office 2016",
+						"Microsoft Edge v40",
+						"Python 3.6"
+						],
+				"accounts"	:	[
+						"user_account",
+						"administrator_account",
+						"system_administrator"
+						],
+				"domain"	:""
+			},
+			"component6" :{
+				"name"	:	"bank_officer_workstation",
+				"connected_components"	:	[ "regional_branch_switch" ],
+				"ip_address"	:	"192.168.54.51",
+				"software"	:	[
+						"Operacijski sustav Windows 7 Service Pack 1 v6.1",
+						"Microsoft office 2016",
+						"Microsoft Edge v40"
+						],
+				"accounts" : [ 
+						"user_account", 
+						"administrator_account" 
+						],
+				"domain"	:""
+			},
+			"component7" :{
+				"name"	:	"regional_admin_workstation",
+				"connected_components"	:	["regional_branch_switch"],
+				"ip_address"	:	"192.168.54.52",
+				"software"	:	[
+						"Operacijski sustav Windows 10 v1703",
+						"Microsoft office 2016",
+						"Microsoft Edge v40"
+						],
+				"accounts"	:	[
+						"user_account",
+						"administrator_account"
+						],
+				"domain"	:""
+			},
+			"component8" :{
+				"name"	:	"bank_counters",
+				"connected_components"	:	[ "regional_branch_switch" ],
+				"ip_address"	:	"192.168.54.60",
+				"software"	:"",
+				"accounts"	:"",
+				"domain"	:""
+			},
+			"component9" :{
+				"name"	:	"backup_server",
+				"connected_components"	:	[ "datacenter_switch" ],
+				"ip_address"	:	"192.168.52.100",
+				"software"	:	[
+						"Operacijski sustav Windows Server 2012 R2 v6.3",
+						"Proprietary backup server rješenje koje koristi smb"
+						],
+				"accounts"	:	[],
+				"domain"	:""
+			},
+			"component10" :{
+				"name"	:	"private_web_server",
+				"connected_components"	:	[ "datacenter_switch" ],
+				"ip_address"	:	"192.168.52.101",
+				"software"	:	[
+						"Operacijski sustav Windows Server 2012 R2 v6.3",
+						"Internet Information Services v8.5"
+						],
+				"accounts"	:	[],
+				"domain"	:""
+			},
+			"component11" :{
+				"name"	:	"database_server",
+				"connected_components"	:	[ "datacenter_switch" ],
+				"ip_address"	:	"192.168.52.102",
+				"software"	:"",
+				"accounts"	:"",
+				"domain"	:""
+			},
+			"component12" :{
+				"name"	:	"domain_controler",
+				"connected_components"	:	[ "datacenter_switch" ],
+				"ip_address"	:	"192.168.52.103",
+				"software"	:	[
+						"Operacijski sustav Windows Server 2012 R2 v6.3",
+						"SQL server 2016"
+						],
+				"accounts"	:	[],
+				"domain"	:""
+			},
+			"component13" :{
+				"name"	:	"public_web_server",
+				"connected_components"	:	[ "dmz_switch" ],
+				"ip_address"	:	"203.0.113.101",
+				"software"	:	[
+						"Operacijski sustav Red Hat Enterprise Linux v7.3",
+						"Apache HTTP server v2.4",
+						"Samba v4.6"
+						],
+				"accounts"	:	[],
+				"domain"	:""
+			},
+			"component14" :{
+				"name"	:	"mail_server",
+				"connected_components"	:	[ "dmz_switch" ],
+				"ip_address"	:	"203.0.113.102",
+				"software"	:	[
+						"Operacijski sustav Windows Server 2012 R2 v6.3",
+						"Microsoft Exchange Server 2016"
+						],
+				"accounts"	:	[],
+				"domain"	:""
+			},
+			"component15" :{
+				"name"	:	"dns_server",
+				"connected_components"	:	[ "dmz_switch" ],
+				"ip_address"	:	"203.0.113.103",
+				"software"	:	[
+						"Operacijski sustav Red Hat Enterprise Linux v7.3",
+						"BIND 9"
+						],
+				"accounts"	:"",
+				"domain"	:""
+			}
+		},
+	
+	"network_components" : 
+		{
+				"component16" :{
+					"name" : "access_switch_accounting",
+					"connected_components" : 
+						[
+							"accountant_workstation", 
+							"distribution_switch"
+						]
+				},
+				"component17" :{
+					"name" : "access_switch_management",
+					"connected_components" : 
+						[
+							"manager_workstation", 
+							"distribution_switch"
+						]
+				},
+				"component18" :{
+					"name" : "access_switch_IT",
+					"connected_components" : 
+						[
+							"developer_workstation",
+							"admin_workstation",
+							"sec_op_workstation",
+							"distribution_switch"
+						]
+				},
+				"component19" :{
+					"name" : "distribution_switch",
+					"connected_components" : 
+						[
+							"access_switch_accounting", 
+							"access_switch_management",
+							"access_switch_IT",
+							"core_router"
+						]
+				},
+				"component20" :{
+					"name" : "core_router",
+					"connected_components" : 
+						[
+							"wan_switch", 
+							"distribution_switch",
+							"datacenter_switch",
+							"dmz_switch"
+						]
+				},
+				"component21" :{
+					"name" : "datacenter_switch",
+					"connected_components" : 
+						[
+							"backup_server", 
+							"private_web_server",
+							"database_server",
+							"domain_controler",
+							"core_router"
+						]
+				},
+				"component22" :{
+					"name" : "dmz_switch",
+					"connected_components" : 
+						[
+							"public_web_server", 
+							"mail_server",
+							"dns_server",
+							"core_router",
+							"internet"
+						]
+				},
+				"component23" :{
+					"name" : "wan_switch",
+					"connected_components" : 
+						[
+							"core_router", 
+							"regional_branch_switch"
+						]
+				},
+				"component24" :{
+					"name" : "regional_branch_switch",
+					"connected_components" : 
+						[
+							"wan_switch", 
+							"bank_officer_workstation",
+							"regional_admin_workstation",
+							"bank_counters"
+						]
+				}
+		}
+}
+
