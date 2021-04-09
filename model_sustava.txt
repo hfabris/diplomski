@@ -255,8 +255,7 @@
 							"public_web_server", 
 							"mail_server",
 							"dns_server",
-							"core_router",
-							"internet"
+							"core_router"
 						]
 				},
 				"component23" :{

@@ -17,9 +17,12 @@ def main():
 
     print(args.agents[0])
 
-    actions_list = json.loads(open(args.actions[0]).read())
-    agents_list = json.loads(open(args.agents[0]).read())
-    system = json.loads(open(args.system[0]).read())
+    with open(args.actions[0]) as actions_file:
+        actions_list = json.loads(actions_file.read())
+    with open(args.agents[0]) as agents_file:
+        agents_list = json.loads(agents_file.read())
+    with open(args.system[0]) as system_file:
+        system = json.loads(system_file.read())
 
     agents = []
     for agent_name in agents_list:
