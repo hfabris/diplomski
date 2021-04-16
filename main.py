@@ -1,9 +1,10 @@
 import json
 import argparse
+
 import network
 import agent
 import action
-
+import graf
 
 # python main.py --agents agent.txt --actions actions.txt --system model_sustava.txt
 def main():
@@ -36,6 +37,8 @@ def main():
         # print(actions_list[action_name])
 
     print(actions)
+    
+    graf.vizualize(network_list)
 
     # for agent_name in agents:
         # print(agent_name.chose_action())

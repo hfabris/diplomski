@@ -1,0 +1,33 @@
+Korištene knjižnice i opis:
+	
+argparse
+	- https://pypi.org/project/argparse/
+	- knjižnica korištena za definiranje i parsiranje argumenata koji su programu potrebni da se ispravno pokrene
+
+json:
+	- https://pypi.org/project/jsons/
+	- knjižnica korištena za čitanje ulaznih datoteka 
+
+PyQt5:
+	- https://pypi.org/project/PyQt5/
+	- korišteni moduli QtWidgets, QtGui, QtCore.Qt
+	- knjižnica korištena za izradu widgeta unutar kojeg je smještena vizualizacija mreže
+		i za izradu buttona koji se koriste za dobiti dodatne informacije o korisničkim komponentama
+
+matplotlib.pyplot:
+	- https://pypi.org/project/matplotlib/
+	- knjižnica korištena za izradu platna na kojem se vizualizira mreže
+
+networkx:
+	- https://pypi.org/project/networkx/
+	- knjižnica korištena za izradu mreže 
+	- stvara se novi usmjereni graf u kojeg se dodaju komponente sustava
+	- knjižnica na platnu crta mrežu i označava čvorove 
+
+
+tkinter:
+	- za sada korišten za izradu popup prozora za dobivanje informacija o komponentama sustava
+	- koristit će se PyQt5.QtWidgets umjesto ove knjižnice
+
+
+

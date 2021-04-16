@@ -9,7 +9,7 @@ class component:
                 self.ip_address = info["ip_address"]
                 self.software = info["software"]
                 self.accounts = info["accounts"]
-                self.domain = info["domain"]
+                self.domains = info["domain"]
                 self.network_component = False
             else:
                 self.network_component = True
@@ -21,6 +21,24 @@ class component:
     def get_name(self): return self.name
     
     def get_connected_components(self): return self.connected_components
+    
+    def is_network_component(self): return self.network_component
+    
+    def get_ip_address(self):
+        if self.network_component: return ""
+        else: return self.ip_address
+        
+    def get_software(self):
+        if self.network_component: return ""
+        else: return self.software
+    
+    def get_accounts(self):
+        if self.network_component: return ""
+        else: return self.accounts
+    
+    def get_domains(self):
+        if self.network_component: return ""
+        else: return self.domains
     
     
 
