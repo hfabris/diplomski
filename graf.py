@@ -1,12 +1,8 @@
-from PyQt5.QtWidgets import *   #QWidget
-from PyQt5.QtGui import *       #QFont
+from PyQt5.QtWidgets import *   #QWidget, QApplication, QStyleFactory, QDesktopWidget, QGridLayout, QVBoxLayout, QPushButton, QScrollArea, QLabel
 from PyQt5.QtCore import Qt
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import networkx as nx
-import tkinter as tk
-from tkinter import ttk
-
 import json
 import network
 
@@ -43,8 +39,6 @@ class PrettyWidget(QWidget):
 
 
         super(PrettyWidget, self).__init__()
-        font = QFont()
-        font.setPointSize(16)
         self.network_info = network_info
         self.initUI()
 
@@ -61,34 +55,39 @@ class PrettyWidget(QWidget):
         self.canvas = FigureCanvas(self.figure)
         grid.addWidget(self.canvas, 0, 2, 9, 9)
 
+        # Create network graph from network informations
+        g = make_network(self.network_info)
 
-        g, user = make_network(self.network_info)
-        
+        self.network_info.add_graph(g)
+
+        # Make subgraph consisting of user components
+        user = ["\n".join(comp.get_name().split("_")) for comp in self.network_info.get_user_components()]
+        user_g = nx.subgraph(g,user)
+
+        # Create scrollbar with buttons for getting user components informations
+        # Add scrollbar to the left side of the grid
         self.createVerticalGroupBox(user)
         buttonLayout = QVBoxLayout()
         buttonLayout.addWidget(self.verticalGroupBox)
-        grid.addLayout(buttonLayout, 0, 0, 9, 2)
-        
-        user_g = nx.subgraph(g,user)
-        
+        grid.addLayout(buttonLayout, 0, 0, 6, 2)
+
+
         # Plot network
         node_pos = {node[0]: (node[1]['X'], -node[1]['Y']) for node in g.nodes(data=True)}
-        node_shp = {node[0]: node[1]['shape'] for node in g.nodes(data=True)}
         edge_col = [e[2]['attr_dict']['color'] for e in g.edges(data=True)]
         nx.draw_networkx(g, pos=node_pos, edge_color=edge_col, node_size=500, alpha=.99, node_color='red',
                          with_labels=True, bbox=dict(facecolor="skyblue", edgecolor='black', boxstyle='round,pad=0.2'), node_shape='h' )
         nx.draw_networkx(user_g, pos=node_pos, edge_color=edge_col, node_size=100, alpha=.99, node_color='blue',
                          with_labels=True, bbox=dict(facecolor="r", edgecolor='black', boxstyle='round,pad=0.2'), node_shape='s' )
         labels = nx.get_edge_attributes(g, 'num_connections')
-        nx.draw_networkx_edge_labels(g, pos=node_pos, edge_labels=labels, font_color='black', alpha=.2)
         plt.title('Network', size=15)
         plt.axis("off")
 
-        # self.cid = self.figure.canvas.mpl_connect('button_press_event', onclick)
         self.canvas.draw_idle()
 
-    def createVerticalGroupBox(self,graph):
-        # self.verticalGroupBox = QScrollArea()        
+    # Create new scrollbar, at the top of the scrollbar add label to describe the actions
+    # For every node in graph, add button to get informations about that node
+    def createVerticalGroupBox(self,graph):        
         scrolllayout = QVBoxLayout()
         
         info_label = QLabel()
@@ -110,23 +109,25 @@ class PrettyWidget(QWidget):
             scrolllayout.addWidget(groupbox)
             groupbox.clicked.connect(self.submitCommand)
  
-    def create_popout(self, name):
-        self.exPopup = popupWidget(name)
-        self.exPopup.setGeometry(200, 300, 100, 100)
+ 
+    # Create popup window, set window size and show the popup
+    def create_popout(self, component):
+        self.exPopup = popupWidget(component)
         self.exPopup.show() 
-        
+
+
     #build and plot network
     def submitCommand(self):
         caller_name = self.sender().text()
-        
+
         for component in self.network_info.get_components():
             if caller_name == component.get_name():
-                create_popup(component)
-                # self.create_popout(component.get_name())
+                # create_popup(component)
+                self.create_popout(component)
                 break
-        
 
 
+    # Possition widget at the center of the screen
     def center(self):
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
@@ -136,50 +137,43 @@ class PrettyWidget(QWidget):
 
 
 
-
+# Create popup window with component informations
 class popupWidget(QWidget):
-    def __init__(self, name):
+    def __init__(self, component):
         super().__init__()
-        self.name = name
+        self.component = component
         self.initUI()
 
     def initUI(self):
-        lblName = QLabel(self.name, self)
+        component_label = QLabel(self.component.get_name(), self)
+        
+        text = '''
+        Component name: {}
+        Connected components: {}
+        Component ip address: {}
+        Installed software on component: {}
+        Accounts on component: {}
+        Component domain: {}
+        '''.format(self.component.get_name(), "", "", "", "", "")
+        
+        font = self.font()
+        font.setPointSize(10)
+        component_label.setFont(font)
+        component_label.setText(text)
+        component_label.setStyleSheet("padding :15px")
+        component_label.adjustSize()
 
 
 
-
-def create_popup(component):
-    
-    msg = '''
-    Component name: 
-        {}
-    IP address:     
-        {}
-    software:       
-        {}
-    accounts:       
-        {}
-    domain:         
-        {}
-    '''.format(component.get_name(), component.get_ip_address(), "\n".join(software for software in component.get_software()), 
-    "\n".join(account for account in component.get_accounts()), "\n".join(domain for domain in component.get_domains()))
-    
-    popup = tk.Tk()
-    popup.wm_title("Component informations")
-    NORM_FONT= ("Verdana", 10)
-    label = ttk.Label(popup, text=msg, font=NORM_FONT)
-    label.pack(side="top", fill="x", pady=10)
-    B1 = ttk.Button(popup, text="Okay", command = popup.destroy)
-    B1.pack()
-    popup.mainloop()
-
+# Make network graph from network informations
+# Create new graph and add components from the networks as graph nodes
+# For every connected component, add edge between those two components
+# Add component possition in the graph as coordinates X and Y
+# return created network graph
 def make_network(network_list):
 
     gr = nx.DiGraph()
-    
-    user = ["\n".join(comp.get_name().split("_")) for comp in network_list.get_user_components()]
-    
+
     for component in network_list.get_components():
         name = component.get_name()
         rename = "\n".join(name.split("_"))
@@ -190,15 +184,11 @@ def make_network(network_list):
             gr.add_edge(rename, connected_component, attr_dict = {'color' : "blue"})
         dic = {}
         dic['X'], dic['Y'] = koordinate[name]
-        if component.is_network_component():
-            dic['shape'] = 'h'
-        else:
-            dic['shape'] = 's'
         gr.nodes[rename].update(dic)
-    
-    return gr, user
 
+    return gr
 
+# vizualize network
 def vizualize(network1):
 
     import sys

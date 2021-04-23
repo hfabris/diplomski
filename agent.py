@@ -45,20 +45,59 @@ class agent:
         strategy_name = getattr(strategies, self.strategy)
         return strategy_name(self.action_list)
         
-    def execute_action(self):
-        while True:
-            action = chose_action()
-            action_name = getattr(action, action)
+    # def execute_action(self):
+        # while True:
+            # action = chose_action()
+            # action_name = getattr(action, action)
             
-            success, results = action_name(self.knowledge)
-            if success != -1:
+            # success, results = action_name(self.knowledge)
+            # if success != -1:
                 # the action is executed 
                 # check results and update knowledge if neccessary
-                break
-                
+                # break
+    def execute_action(self, action_name, args):
+        
+        print("Action execution called")
+        
+        action_call = getattr(action, action_name)
+        return action_call(self, args)
 
 
 
+
+
+class gray_agent(agent):
+
+    def __init__(self, info):
+        super(gray_agent,self).__init__("gray_agent", info)
+        self.unread_emails = []
+
+    def add_unread_email(self,sender):
+        self.unread_emails.append(sender)
+
+    def get_unread_emails(self): 
+        return self.unread_emails
+
+    def get_oldest_unread_email(self):
+        if self.unread_emails != 0:
+            oldest = self.unread_emails[0]
+            del self.unread_emails[0]
+            return oldest
+        return ""
+
+
+
+
+class attacker(agent):
+
+    def __init__(self, info):
+        super(attacker,self).__init__("attacker", info)
+
+
+class defender(agent):
+
+    def __init__(self, info):
+        super(defender,self).__init__("defender", info)
 
 
 

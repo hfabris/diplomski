@@ -4,12 +4,13 @@
 		"actions"	:	[
 			"reboot_host",
 			"user_login_to_host",
-			"Opening a network connection between two hosts",
-			"Closing a network connection between two hosts",
-			"open email"
+			"open_connection_between_hosts",
+			"close_connection_between_hosts",
+			"open_email",
+			"browser_internet"
 			],
 		"strategy"	:	"Random",
-		"knowledge"	:	"domain",
+		"knowledge"	:	"accountant_workstation",
 		"tools"	:	[]
 	},
 	"attacker" :
