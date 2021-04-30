@@ -1,3 +1,5 @@
+# class to describe general informations about components
+# every component has id, name, and connected_components
 class component:
 
     def __init__(self, id, name, connected):
@@ -25,6 +27,8 @@ class network_component(component):
             print("Invalid network component {} description".format(id))
 
 
+# class which describes user component
+# additional informations which user components have include ip address, software, max number of accounts, priviledge level and domain
 class user_component(component):
 
     def __init__(self, id, info):
@@ -34,6 +38,8 @@ class user_component(component):
             self.ip_address = info["ip_address"]
             self.software = info["software"]
             self.accounts = info["accounts"]
+            self.max_account_number = info["max_account_number"]
+            self.priviledge_level = info["priviledge_level"]
             self.domains = info["domain"]
 
             self.status = False
@@ -79,7 +85,6 @@ class user_component(component):
             return 1
         return -1
 
-
     # Methods to add, remove and get connections between this component and other components
     def add_active_connection(self, other_component, agent):
         if self.status == True:
@@ -96,6 +101,8 @@ class user_component(component):
     
     def get_active_connections(self): return self.active_connections
 
+# class to make network model from components descriptions
+# network model consists of user and network components
 class network_model:
 
     def __init__(self, components):
@@ -114,21 +121,12 @@ class network_model:
         self.components_list = self.user_components + self.network_components
         self.components_names = set( component.name for component in self.components_list )
 
-        # print(self.components_names)
-
-        # self.network = self.connect_components(self.components_list, self.components_names)
-
 
     def get_user_components(self):
         return self.user_components
 
     def get_network_components(self):
         return self.network_components
-
-    def connect_components(self, components, names):
-        # print(components)
-        for component in components:
-            print(component.get_connected_components())
 
     def get_components(self):
         return self.network_components + self.user_components
@@ -139,6 +137,8 @@ class network_model:
                 return component
         return -1
 
-    def add_graph(self, graph): self.graph = graph
+    def add_graph(self, graph): 
+        self.graph = graph
 
-    def get_graph(self): return self.graph
+    def get_graph(self): 
+        return self.graph

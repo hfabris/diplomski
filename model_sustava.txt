@@ -11,6 +11,9 @@
 						"Microsoft Edge v40"
 						],
 				"accounts" : [ "user_account" ],
+				"max_account_number" : "10",
+				"worker_name" : "Accountant",
+				"priviledge_level" : "",
 				"domain"	: ""	
 			},
 			"component2" :{
@@ -26,6 +29,9 @@
 						"user_account", 
 						"administrator_account" 
 						],
+				"max_account_number" : "10",
+				"worker_name" : "Manager",
+				"priviledge_level" : "",
 				"domain"	:	""
 			},
 			"component3" :{
@@ -40,6 +46,9 @@
 						"Python 3.6"
 						],
 				"accounts"	: [ "user_account" ],
+				"max_account_number" : "10",
+				"worker_name" : "Developer",
+				"priviledge_level" : "",
 				"domain"	:""
 			},
 			"component4" :{
@@ -55,6 +64,9 @@
 						"user_account",
 						"administrator_account"
 						],
+				"max_account_number" : "3",
+				"worker_name" : "System administrator",
+				"priviledge_level" : "",
 				"domain"	:""
 			},
 			"component5" :{
@@ -72,11 +84,14 @@
 						"administrator_account",
 						"system_administrator"
 						],
+				"max_account_number" : "3",
+				"worker_name" : "Security operator",
+				"priviledge_level" : "",
 				"domain"	:""
 			},
-			"component6" :{
-				"name"	:	"bank_officer_workstation",
-				"connected_components"	:	[ "regional_branch_switch" ],
+			"component6_1" :{
+				"name"	:	"Zagreb_bank_officer_workstation",
+				"connected_components"	:	[ "Zagreb_regional_branch_switch" ],
 				"ip_address"	:	"192.168.54.51",
 				"software"	:	[
 						"Operacijski sustav Windows 7 Service Pack 1 v6.1",
@@ -87,11 +102,50 @@
 						"user_account", 
 						"administrator_account" 
 						],
+				"max_account_number" : "0",
+				"worker_name" : "Bank officer",
+				"priviledge_level" : "",
 				"domain"	:""
 			},
-			"component7" :{
-				"name"	:	"regional_admin_workstation",
-				"connected_components"	:	["regional_branch_switch"],
+			"component6_2" :{
+				"name"	:	"Split_bank_officer_workstation",
+				"connected_components"	:	[ "Split_regional_branch_switch" ],
+				"ip_address"	:	"192.168.54.101",
+				"software"	:	[
+						"Operacijski sustav Windows 7 Service Pack 1 v6.1",
+						"Microsoft office 2016",
+						"Microsoft Edge v40"
+						],
+				"accounts" : [ 
+						"user_account", 
+						"administrator_account" 
+						],
+				"max_account_number" : "0",
+				"worker_name" : "Bank officer",
+				"priviledge_level" : "",
+				"domain"	:""
+			},
+			"component6_3" :{
+				"name"	:	"Rijeka_bank_officer_workstation",
+				"connected_components"	:	[ "Rijeka_regional_branch_switch" ],
+				"ip_address"	:	"192.168.54.151",
+				"software"	:	[
+						"Operacijski sustav Windows 7 Service Pack 1 v6.1",
+						"Microsoft office 2016",
+						"Microsoft Edge v40"
+						],
+				"accounts" : [ 
+						"user_account", 
+						"administrator_account" 
+						],
+				"max_account_number" : "0",
+				"worker_name" : "Bank officer",
+				"priviledge_level" : "",
+				"domain"	:""
+			},
+			"component7_1" :{
+				"name"	:	"Zagreb_regional_admin_workstation",
+				"connected_components"	:	["Zagreb_regional_branch_switch"],
 				"ip_address"	:	"192.168.54.52",
 				"software"	:	[
 						"Operacijski sustav Windows 10 v1703",
@@ -102,14 +156,78 @@
 						"user_account",
 						"administrator_account"
 						],
+				"max_account_number" : "10",
+				"worker_name" : "Bank administrator",
+				"priviledge_level" : "",
 				"domain"	:""
 			},
-			"component8" :{
-				"name"	:	"bank_counters",
-				"connected_components"	:	[ "regional_branch_switch" ],
+			"component7_2" :{
+				"name"	:	"Split_regional_admin_workstation",
+				"connected_components"	:	["Split_regional_branch_switch"],
+				"ip_address"	:	"192.168.54.102",
+				"software"	:	[
+						"Operacijski sustav Windows 10 v1703",
+						"Microsoft office 2016",
+						"Microsoft Edge v40"
+						],
+				"accounts"	:	[
+						"user_account",
+						"administrator_account"
+						],
+				"max_account_number" : "10",
+				"worker_name" : "Bank administrator",
+				"priviledge_level" : "",
+				"domain"	:""
+			},
+			"component7_3" :{
+				"name"	:	"Rijeka_regional_admin_workstation",
+				"connected_components"	:	["Rijeka_regional_branch_switch"],
+				"ip_address"	:	"192.168.54.152",
+				"software"	:	[
+						"Operacijski sustav Windows 10 v1703",
+						"Microsoft office 2016",
+						"Microsoft Edge v40"
+						],
+				"accounts"	:	[
+						"user_account",
+						"administrator_account"
+						],
+				"max_account_number" : "10",
+				"worker_name" : "Bank administrator",
+				"priviledge_level" : "",
+				"domain"	:""
+			},
+			"component8_1" :{
+				"name"	:	"Zagreb_bank_counters",
+				"connected_components"	:	[ "Zagreb_regional_branch_switch" ],
 				"ip_address"	:	"192.168.54.60",
 				"software"	:"",
 				"accounts"	:"",
+				"max_account_number" : "10",
+				"worker_name" : "Bank official",
+				"priviledge_level" : "",
+				"domain"	:""
+			},
+			"component8_2" :{
+				"name"	:	"Split_bank_counters",
+				"connected_components"	:	[ "Split_regional_branch_switch" ],
+				"ip_address"	:	"192.168.54.110",
+				"software"	:"",
+				"accounts"	:"",
+				"max_account_number" : "10",
+				"worker_name" : "Bank official",
+				"priviledge_level" : "",
+				"domain"	:""
+			},
+			"component8_3" :{
+				"name"	:	"Rijeka_bank_counters",
+				"connected_components"	:	[ "Rijeka_regional_branch_switch" ],
+				"ip_address"	:	"192.168.54.160",
+				"software"	:"",
+				"accounts"	:"",
+				"max_account_number" : "10",
+				"worker_name" : "Bank official",
+				"priviledge_level" : "",
 				"domain"	:""
 			},
 			"component9" :{
@@ -121,6 +239,9 @@
 						"Proprietary backup server rješenje koje koristi smb"
 						],
 				"accounts"	:	[],
+				"max_account_number" : "0",
+				"worker_name" : "",
+				"priviledge_level" : "",
 				"domain"	:""
 			},
 			"component10" :{
@@ -132,6 +253,9 @@
 						"Internet Information Services v8.5"
 						],
 				"accounts"	:	[],
+				"max_account_number" : "0",
+				"worker_name" : "",
+				"priviledge_level" : "",
 				"domain"	:""
 			},
 			"component11" :{
@@ -140,6 +264,9 @@
 				"ip_address"	:	"192.168.52.102",
 				"software"	:"",
 				"accounts"	:"",
+				"max_account_number" : "0",
+				"worker_name" : "",
+				"priviledge_level" : "",
 				"domain"	:""
 			},
 			"component12" :{
@@ -151,6 +278,9 @@
 						"SQL server 2016"
 						],
 				"accounts"	:	[],
+				"max_account_number" : "0",
+				"worker_name" : "",
+				"priviledge_level" : "",
 				"domain"	:""
 			},
 			"component13" :{
@@ -163,6 +293,9 @@
 						"Samba v4.6"
 						],
 				"accounts"	:	[],
+				"max_account_number" : "0",
+				"worker_name" : "",
+				"priviledge_level" : "",
 				"domain"	:""
 			},
 			"component14" :{
@@ -174,6 +307,9 @@
 						"Microsoft Exchange Server 2016"
 						],
 				"accounts"	:	[],
+				"max_account_number" : "0",
+				"worker_name" : "",
+				"priviledge_level" : "",
 				"domain"	:""
 			},
 			"component15" :{
@@ -185,6 +321,9 @@
 						"BIND 9"
 						],
 				"accounts"	:"",
+				"max_account_number" : "0",
+				"worker_name" : "",
+				"priviledge_level" : "",
 				"domain"	:""
 			}
 		},
@@ -263,17 +402,39 @@
 					"connected_components" : 
 						[
 							"core_router", 
-							"regional_branch_switch"
+							"Zagreb_regional_branch_switch",
+							"Split_regional_branch_switch",
+							"Rijeka_regional_branch_switch"
 						]
 				},
 				"component24" :{
-					"name" : "regional_branch_switch",
+					"name" : "Zagreb_regional_branch_switch",
 					"connected_components" : 
 						[
 							"wan_switch", 
-							"bank_officer_workstation",
-							"regional_admin_workstation",
-							"bank_counters"
+							"Zagreb_bank_officer_workstation",
+							"Zagreb_regional_admin_workstation",
+							"Zagreb_bank_counters"
+						]
+				},
+				"component25" :{
+					"name" : "Split_regional_branch_switch",
+					"connected_components" : 
+						[
+							"wan_switch", 
+							"Split_bank_officer_workstation",
+							"Split_regional_admin_workstation",
+							"Split_bank_counters"
+						]
+				},
+				"component26" :{
+					"name" : "Rijeka_regional_branch_switch",
+					"connected_components" : 
+						[
+							"wan_switch", 
+							"Rijeka_bank_officer_workstation",
+							"Rijeka_regional_admin_workstation",
+							"Rijeka_bank_counters"
 						]
 				}
 		}

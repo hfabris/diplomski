@@ -41,7 +41,7 @@ def user_login_to_host(agent, args):
             component.add_active_account(agent)
 
             return 1
-        return -1
+        return 0
     except:
         return -1
 
@@ -126,7 +126,7 @@ def open_connection_between_hosts(agent, args):
             component_from.add_active_connection(component_to.get_name(), agent)
             component_to.add_active_connection(component_from.get_name(), agent)
             return 1
-        return -1
+        return 0
     except:
         return -1
 
@@ -148,9 +148,154 @@ def close_connection_between_hosts(agent, args):
             component_from.remove_active_connection(component_to.get_name(), agent)
             component_to.remove_active_connection(component_from.get_name(), agent)
             return 1
-        return -1
+        return 0
     except:
         return -1
+
+
+# action: check opened connections on host
+# preconditions: agent is defender and has permission to perform check
+# postconditions: if connection is opened by attacker, it is terminated
+def check_opened_connections(agent, args):
+
+    try:
+        host_name = args[0]
+        network = args[1]
+
+        component = network.get_component(host_name)
+        component_connections = component.get_active_connections()
+        if agent.name == "defender" and agent.get_priviledge_level() == 5:
+            for connected_component, initiator in component_connections:
+                if initiator == "attacker":
+                    component.remove_active_connection(connected_component, initiator)
+                    connected_component.remove_active_connection(component, initiator)
+            return 1
+        return 0
+    except:
+        return -1
+
+
+# action: delete account on host
+# preconditions: agent is defender and has sufficient priviledge level
+# postconditions: account on speficied host is deleted
+def delete_account(agent, args):
+
+    try:
+        host_name = args[0]
+        network = args[1]
+        account_name = args[2]
+
+        component = network.get_component(host_name)
+
+        if agent.name == "defender" and agent.priviledge_level == 5:
+            return component.remove_active_account(account_name)
+        return 0
+    except:
+        return -1
+
+
+# action: dump credentials of host X
+# preconditions: agent is attacker and has escalated foothold on host X
+# postconditions: learn all credentials of active users on host X
+def dump_credentials(agent, args):
+    
+    try:
+        host_name = args[0]
+        network = args[1]
+        component = network.get_component(host_name)
+
+        if agent.get_name() == "attacker" and agent.get_priviledge_level() > component.get_highest_priviledge():
+
+            active_accounts = component.get_active_accounts()
+            agent.add_knowledge()
+            return 1
+
+        return 0
+
+    except:
+        return -1
+
+# action: priviledge escalation on host X
+# preconditions: agent is attacker and attacker has to have low-level priviledge on host X
+# postconditions: priviledge level is increased by 1
+def escalate_priviledges(agent, args):
+
+    try:
+        host_name = args[0]
+        network = args[1]
+
+        if agent.get_name() == "attacker" and agent.get_priviledge_level(host_name) != 0:
+            agent.set_priviledge_level(self, host_name, agent.get_priviledge_level(host_name) + 1)
+            return 1
+        return 0
+    except:
+        return -1
+
+# action: enumerate host X
+# preconditions: agent is attacker and agent has escalated priviledges on host X, and agent did not already enumerated host X
+# postconditions: agent has enumerated host X, agent knows all active connections of host X
+def enumerate_host(agent, args):
+
+    try:
+
+        host_name = args[0]
+        network = args[1]
+
+        if agent.get_name == "attacker" and agent.get_priviledge_level(host_name) == host_name.get_highest_priviledge() \
+            and host_name not in agent.enumerated():
+
+            agent.add_enumerated(host_name)
+            agent.add_knowledge("active_connections", host_name.get_active_connections())
+            return 1
+
+        return 0
+
+    except:
+        return -1
+
+# action: exfiltrate data from host X
+# preconditions: agent is attacker and agent has escalated priviledges on host X, enumerated host X and did not already exfiltrated host X
+# postconditions: agent exfiltrated host X
+def exfiltrate(agent, args):
+
+    try:
+
+        host_name = args[0]
+        network = args[0]
+
+        if agent.get_name == "attacker" and agent.get_priviledge_level(host_name) == host_name.get_highest_priviledge() and \
+
+            agent.is_enumerated(host_name) and not agent.is_exfiltrated(host_name):
+            agent.add_exfiltrated(host_name)
+            print("Host {} exfiltrated".format(host_name))
+            return 1
+
+        return 0
+
+    except:
+        return -1
+
+
+''' action template
+# action: [name of the action]
+# preconditions: [preconditions that needs to be satisfied to perform action]
+# postconditions: [postconditions that happen once the action is successfully executed]
+def action_name(agent, args):
+
+    try:
+
+        get arguments
+
+        if preconditions:
+            execute action
+            return 1
+        # if the preconditions are not satisfied
+        return 0
+    except:
+        # error happened while trying to execute action
+        return -1
+'''
+
 
 
 

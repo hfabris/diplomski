@@ -17,7 +17,7 @@
 	{
 		"actions"	:	[
 			"lateral movement",
-			"dump credentials",
+			"dump_credentials",
 			"enumerate host",
 			"exfiltrate data",
 			"run exploit",
@@ -36,8 +36,8 @@
 	"defender" :
 	{
 		"actions"	:	[
-			"connection analysis",
-			"delete account",
+			"check_opened_connections",
+			"delete_account",
 			"log analysis",
 			"add firewall rules"
 			],
