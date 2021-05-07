@@ -8,19 +8,14 @@ class agent:
             self.name = name
             self.action_list = info["actions"]
             self.strategy = info["strategy"]
-            
+
             # check if the strategy exists
-            strategy_name = getattr(strategies, self.strategy) 
-            strategy_name(self.action_list)
-            
+            # strategy_name = getattr(strategies, self.strategy) 
+            # strategy_name(self.action_list)
+
             self.knowledge = info["knowledge"]  # turn to dictionary
             self.tools = info["tools"]
-            
-            # check if actions exist
-            # for action in self.actions:
-                # action_name = getattr(actions, action)
-                # action_name(self.knowledge)
-            
+
         except:
             print("Invalid agent {} description".format(name))
             exit()
@@ -44,33 +39,49 @@ class agent:
     def chose_action(self):
         strategy_name = getattr(strategies, self.strategy)
         return strategy_name(self.action_list)
-        
-    # def execute_action(self):
-        # while True:
-            # action = chose_action()
-            # action_name = getattr(action, action)
-            
-            # success, results = action_name(self.knowledge)
-            # if success != -1:
-                # the action is executed 
-                # check results and update knowledge if neccessary
-                # break
+
     def execute_action(self, action_name, args):
-        
-        print("Action execution called")
-        
+
+        # print("Action {} execution called".format(action_name) )
+
         action_call = getattr(action, action_name)
         return action_call(self, args)
 
 
-
-
-
-class gray_agent(agent):
+class employee():
 
     def __init__(self, info):
-        super(gray_agent,self).__init__("gray_agent", info)
+        self.component = info["component"]
+        self.name = info["name"]
+        self.priviledge_level = info["priviledge_level"] 
+        self.domain = info["domain"]
+        self.active_connections = []
         self.unread_emails = []
+
+    def get_component(self):
+        return self.component
+
+    def get_name(self):
+        return self.name
+
+    def get_priviledge_level(self):
+        return self.priviledge_level
+
+    def get_domain(self):
+        return self.domain
+
+    def get_active_connections(self):
+        return self.active_connections
+
+    def add_connections(self, connection):
+        self.active_connections.append(connection.get_name())
+
+    def remove_connection(self, employee):
+    
+        if employee in self.active_connections:
+            del self.active_connections[self.active_connections.index(employee)]
+            return 1
+        return 0
 
     def add_unread_email(self,sender):
         self.unread_emails.append(sender)
@@ -86,6 +97,13 @@ class gray_agent(agent):
         return ""
 
 
+class gray_agent(agent):
+
+    def __init__(self, info):
+        super(gray_agent,self).__init__("gray_agent", info)
+
+
+
 
 
 class attacker(agent):
@@ -93,9 +111,28 @@ class attacker(agent):
     def __init__(self, info):
         super(attacker,self).__init__("attacker", info)
         self.priviledge_level = {}
+        self.compromise = {}
+        
+        self.knowledge["credentials"] = []              # list of credentials attacker has found in system
+        self.knowledge["connected"] = []                # list of tuples, (component_X, component_Y), where component_X and component_Y are connected
+        self.knowledge["local_admins"] = []             # list of tuples, (component, local admins of component)
+        self.knowledge["active_connections"] = []       # list of active connections attacker knows
+        self.knowledge["remote"] = []                   # list of tuples, (account_A, component_X), where account_A is authorized to remotely log in to component_X 
+        
+        self.compromise["established_footholds"] = []   # list of components attacker has established foothold on 
+        self.compromise["probed_host"] = []             # list of hosts attacker has probed to find admins
+        self.compromise["exfiltrated"] = []             # list of components attacker has exfiltrated data from
+        self.compromise["enumerated"] = []              # list of components attacker has enumerated 
+        self.compromise["escalated"] = [] 
+        self.compromise["exploited"] = []               # list of tuples, (host_X, exploit_E), where attacker has tried to exploit host_X with exploit_E
+        
+        self.current_component = None
 
-    def add_knowledge(self, new_knowledge):
-        self.knowledge.append(new_knowledge)
+    def add_knowledge(self, category, new_knowledge):
+        self.knowledge[category].append(new_knowledge)
+
+    def add_compromise(self, category, new_compromise):
+        self.compromise[category].append(new_compromise)
 
     def get_priviledge_level(self, component):
         knowledge_priviledges = self.knowledge["priviledges"]
@@ -106,29 +143,29 @@ class attacker(agent):
 
     def knows_connected(component1, component2):
 
-        connections = self.knowledge["connections"]
+        connections = self.knowledge["connected"]
         if ((component1, component2) in connections) or ( (component2, component1) in connections):
             return 1
         return 0
 
-    def knows_credentials(component):
+    def knows_credentials(self,component):
 
         credentials = self.knowledge["credentials"]
         if component in credentials:
             return 1
         return 0
 
-    def add_enumerated(component):
-        self.enumerated.append(component)
+    def is_enumerated(self, component):
+        return component in self.compromise["enumerated"]
 
-    def is_enumerated(component):
-        return component in self.enumerated
+    def is_exfiltrated(self, component):
+        return component in self.compromise["exfiltrated"]
 
-    def add_exfiltrated(component):
-        self.exfiltrated.append(component)
+    def get_current_component(self):
+        return self.current_component
 
-    def is_exfiltrated(component):
-        return component in self.exfiltrated
+    def set_current_component(self, component):
+        self.current_component = component
 
 
 class defender(agent):

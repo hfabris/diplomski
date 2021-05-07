@@ -1,7 +1,9 @@
 from PyQt5.QtWidgets import *   #QWidget, QApplication, QStyleFactory, QDesktopWidget, QGridLayout, QVBoxLayout, QPushButton, QScrollArea, QLabel
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import *
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from os import environ
 import networkx as nx
 import json
 import network
@@ -41,12 +43,20 @@ koordinate = {
     "accountant_workstation" : (800,600)
 }
 
+def suppress_qt_warnings():
+    environ["QT_DEVICE_PIXEL_RATIO"] = "0"
+    environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
+    environ["QT_SCREEN_SCALE_FACTORS"] = "1"
+    environ["QT_SCALE_FACTOR"] = "1"
+
 class PrettyWidget(QWidget):
 
     def __init__(self, network_info):
 
 
         super(PrettyWidget, self).__init__()
+        font = QFont()
+        font.setPointSize(16)
         self.network_info = network_info
         self.initUI()
 
@@ -90,6 +100,8 @@ class PrettyWidget(QWidget):
         labels = nx.get_edge_attributes(g, 'num_connections')
         plt.title('Network', size=15)
         plt.axis("off")
+
+        self.showMaximized()
 
         self.canvas.draw_idle()
 
@@ -200,6 +212,7 @@ def make_network(network_list):
 def vizualize(network1):
 
     import sys
+    suppress_qt_warnings()
     app = QApplication(sys.argv)
     app.aboutToQuit.connect(app.deleteLater)
     app.setStyle(QStyleFactory.create("gtk"))

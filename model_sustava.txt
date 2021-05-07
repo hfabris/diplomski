@@ -14,7 +14,8 @@
 				"max_account_number" : "10",
 				"worker_name" : "Accountant",
 				"priviledge_level" : "",
-				"domain"	: ""	
+				"domain"	: "",
+				"vulnerable" : []
 			},
 			"component2" :{
 				"name" : "manager_workstation",
@@ -32,7 +33,8 @@
 				"max_account_number" : "10",
 				"worker_name" : "Manager",
 				"priviledge_level" : "",
-				"domain"	:	""
+				"domain"	:	"",
+				"vulnerable" : []
 			},
 			"component3" :{
 				"name"	:	"developer_workstation",
@@ -49,7 +51,8 @@
 				"max_account_number" : "10",
 				"worker_name" : "Developer",
 				"priviledge_level" : "",
-				"domain"	:""
+				"domain"	:"",
+				"vulnerable" : []
 			},
 			"component4" :{
 				"name"	:	"admin_workstation",
@@ -67,7 +70,8 @@
 				"max_account_number" : "3",
 				"worker_name" : "System administrator",
 				"priviledge_level" : "",
-				"domain"	:""
+				"domain"	:"",
+				"vulnerable" : []
 			},
 			"component5" :{
 				"name"	:	"sec_op_workstation",
@@ -87,7 +91,8 @@
 				"max_account_number" : "3",
 				"worker_name" : "Security operator",
 				"priviledge_level" : "",
-				"domain"	:""
+				"domain"	:"",
+				"vulnerable" : []
 			},
 			"component6_1" :{
 				"name"	:	"Zagreb_bank_officer_workstation",
@@ -102,10 +107,11 @@
 						"user_account", 
 						"administrator_account" 
 						],
-				"max_account_number" : "0",
-				"worker_name" : "Bank officer",
+				"max_account_number" : "1",
+				"worker_name" : "Zagreb bank officer",
 				"priviledge_level" : "",
-				"domain"	:""
+				"domain"	:"",
+				"vulnerable" : []
 			},
 			"component6_2" :{
 				"name"	:	"Split_bank_officer_workstation",
@@ -120,10 +126,11 @@
 						"user_account", 
 						"administrator_account" 
 						],
-				"max_account_number" : "0",
-				"worker_name" : "Bank officer",
+				"max_account_number" : "1",
+				"worker_name" : "Split bank officer",
 				"priviledge_level" : "",
-				"domain"	:""
+				"domain"	:"",
+				"vulnerable" : []
 			},
 			"component6_3" :{
 				"name"	:	"Rijeka_bank_officer_workstation",
@@ -138,10 +145,11 @@
 						"user_account", 
 						"administrator_account" 
 						],
-				"max_account_number" : "0",
-				"worker_name" : "Bank officer",
+				"max_account_number" : "1",
+				"worker_name" : "Rijeka bank officer",
 				"priviledge_level" : "",
-				"domain"	:""
+				"domain"	:"",
+				"vulnerable" : []
 			},
 			"component7_1" :{
 				"name"	:	"Zagreb_regional_admin_workstation",
@@ -156,10 +164,11 @@
 						"user_account",
 						"administrator_account"
 						],
-				"max_account_number" : "10",
-				"worker_name" : "Bank administrator",
+				"max_account_number" : "1",
+				"worker_name" : "Zagreb bank administrator",
 				"priviledge_level" : "",
-				"domain"	:""
+				"domain"	:"",
+				"vulnerable" : []
 			},
 			"component7_2" :{
 				"name"	:	"Split_regional_admin_workstation",
@@ -174,10 +183,11 @@
 						"user_account",
 						"administrator_account"
 						],
-				"max_account_number" : "10",
-				"worker_name" : "Bank administrator",
+				"max_account_number" : "1",
+				"worker_name" : "Split bank administrator",
 				"priviledge_level" : "",
-				"domain"	:""
+				"domain"	:"",
+				"vulnerable" : []
 			},
 			"component7_3" :{
 				"name"	:	"Rijeka_regional_admin_workstation",
@@ -192,10 +202,11 @@
 						"user_account",
 						"administrator_account"
 						],
-				"max_account_number" : "10",
-				"worker_name" : "Bank administrator",
+				"max_account_number" : "1",
+				"worker_name" : "Rijeka bank administrator",
 				"priviledge_level" : "",
-				"domain"	:""
+				"domain"	:"",
+				"vulnerable" : []
 			},
 			"component8_1" :{
 				"name"	:	"Zagreb_bank_counters",
@@ -204,9 +215,10 @@
 				"software"	:"",
 				"accounts"	:"",
 				"max_account_number" : "10",
-				"worker_name" : "Bank official",
+				"worker_name" : "Zagreb bank official",
 				"priviledge_level" : "",
-				"domain"	:""
+				"domain"	:"",
+				"vulnerable" : []
 			},
 			"component8_2" :{
 				"name"	:	"Split_bank_counters",
@@ -215,9 +227,10 @@
 				"software"	:"",
 				"accounts"	:"",
 				"max_account_number" : "10",
-				"worker_name" : "Bank official",
+				"worker_name" : "Split bank official",
 				"priviledge_level" : "",
-				"domain"	:""
+				"domain"	:"",
+				"vulnerable" : []
 			},
 			"component8_3" :{
 				"name"	:	"Rijeka_bank_counters",
@@ -226,9 +239,10 @@
 				"software"	:"",
 				"accounts"	:"",
 				"max_account_number" : "10",
-				"worker_name" : "Bank official",
+				"worker_name" : "Rijeka bank official",
 				"priviledge_level" : "",
-				"domain"	:""
+				"domain"	:"",
+				"vulnerable" : []
 			},
 			"component9" :{
 				"name"	:	"backup_server",
@@ -242,7 +256,8 @@
 				"max_account_number" : "0",
 				"worker_name" : "",
 				"priviledge_level" : "",
-				"domain"	:""
+				"domain"	:"",
+				"vulnerable" : []
 			},
 			"component10" :{
 				"name"	:	"private_web_server",
@@ -256,7 +271,8 @@
 				"max_account_number" : "0",
 				"worker_name" : "",
 				"priviledge_level" : "",
-				"domain"	:""
+				"domain"	:"",
+				"vulnerable" : []
 			},
 			"component11" :{
 				"name"	:	"database_server",
@@ -267,7 +283,8 @@
 				"max_account_number" : "0",
 				"worker_name" : "",
 				"priviledge_level" : "",
-				"domain"	:""
+				"domain"	:"",
+				"vulnerable" : []
 			},
 			"component12" :{
 				"name"	:	"domain_controler",
@@ -281,7 +298,8 @@
 				"max_account_number" : "0",
 				"worker_name" : "",
 				"priviledge_level" : "",
-				"domain"	:""
+				"domain"	:"",
+				"vulnerable" : []
 			},
 			"component13" :{
 				"name"	:	"public_web_server",
@@ -296,7 +314,8 @@
 				"max_account_number" : "0",
 				"worker_name" : "",
 				"priviledge_level" : "",
-				"domain"	:""
+				"domain"	:"",
+				"vulnerable" : []
 			},
 			"component14" :{
 				"name"	:	"mail_server",
@@ -310,7 +329,8 @@
 				"max_account_number" : "0",
 				"worker_name" : "",
 				"priviledge_level" : "",
-				"domain"	:""
+				"domain"	:"",
+				"vulnerable" : []
 			},
 			"component15" :{
 				"name"	:	"dns_server",
@@ -324,7 +344,8 @@
 				"max_account_number" : "0",
 				"worker_name" : "",
 				"priviledge_level" : "",
-				"domain"	:""
+				"domain"	:"",
+				"vulnerable" : []
 			}
 		},
 	

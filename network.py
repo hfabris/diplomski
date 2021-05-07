@@ -38,13 +38,15 @@ class user_component(component):
             self.ip_address = info["ip_address"]
             self.software = info["software"]
             self.accounts = info["accounts"]
-            self.max_account_number = info["max_account_number"]
+            self.max_account_number = int(info["max_account_number"])
+            self.worker_name = info["worker_name"]
             self.priviledge_level = info["priviledge_level"]
             self.domains = info["domain"]
+            self.vulnerable = info["vulnerable"]
 
             self.status = False
             self.active_accounts = []
-            self.active_connections = []
+            self.active_connections = {}
 
         except:
             print("Invalid user component {} description".format(id))
@@ -73,9 +75,9 @@ class user_component(component):
     # Methods to add or remove account to/from the list of active account on this component
     # Component needs to be active to be able to add or remove accounts
     # if the method is successful it returns 1, otherwise it returns -1
-    def add_active_account(self, account):
+    def add_active_account(self, account_name):
         if self.status == True:
-            self.active_accounts.append(account)
+            self.active_accounts.append(account_name)
             return 1
         return -1
 
@@ -85,21 +87,52 @@ class user_component(component):
             return 1
         return -1
 
+    def remove_all_active_accounts(self):
+        if self.status == True:
+            self.active_accounts = []
+            return 1
+        return -1
+
     # Methods to add, remove and get connections between this component and other components
     def add_active_connection(self, other_component, agent):
         if self.status == True:
-            self.active_connections.append( (other_component, agent) )
+            self.active_connections[other_component] = self.active_connections.setdefault(other_component, [])
+            self.active_connections[other_component].append(agent)
+            # self.active_connections.append( (other_component, agent) )
             return 1
         return -1
     
-    def remove_active_connection(self, other_component, agent):
+    def remove_active_connection(self, other_component, employee1, employee2):
         
-        if (other_component, agent) in self.active_connections:
-            del self.active_connections[self.active_connections.index( (other_component, agent) )]
-            return 1
-        return -1
+        active_connections = self.active_connections[other_component.get_name()]
+        
+        if (employee1, employee2) in active_connections:
+            del active_connections[active_connections.index((employee1, employee2))]
+        
+        elif (employee2, employee1) in active_connections:
+            del active_connections[active_connections.index((employee2, employee1))]
+        
+        else:
+            return 0
+        
+        self.active_connections[other_component.get_name()] = active_connections
+        return 1
     
-    def get_active_connections(self): return self.active_connections
+    def get_active_connections(self): 
+        return self.active_connections
+
+    def is_vulnerable(self, exploit):
+        if exploit in self.vulnerable:
+            return 1
+        return 0
+
+
+
+
+
+
+
+
 
 # class to make network model from components descriptions
 # network model consists of user and network components

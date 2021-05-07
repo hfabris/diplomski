@@ -7,27 +7,28 @@
 			"open_connection_between_hosts",
 			"close_connection_between_hosts",
 			"open_email",
+			"send_email",
 			"browser_internet"
 			],
 		"strategy"	:	"Random",
-		"knowledge"	:	"accountant_workstation",
+		"knowledge"	:	{},
 		"tools"	:	[]
 	},
 	"attacker" :
 	{
 		"actions"	:	[
-			"lateral movement",
+			"lateral_movement",
 			"dump_credentials",
-			"enumerate host",
-			"exfiltrate data",
-			"run exploit",
-			"escalate privileges",
-			"defense evasion",
-			"account discovery",
-			"initial access"
+			"enumerate_host",
+			"exfiltrate_data",
+			"run_exploit",
+			"escalate_privileges",
+			"defense_evasion",
+			"account_discovery",
+			"initial_access"
 			],
 		"strategy"	:	"Random",
-		"knowledge"	:	"",
+		"knowledge"	:	{},
 		"tools"		:	[
 			"CVE-2018-1111",
 			"CVE-2019-0211"
@@ -38,11 +39,10 @@
 		"actions"	:	[
 			"check_opened_connections",
 			"delete_account",
-			"log analysis",
-			"add firewall rules"
+			"log_analysis"
 			],
 		"strategy"	:	"Random",
-		"knowledge"	:	"system",
+		"knowledge"	:	{},
 		"tools"		:	[
 			"admin password"
 			]

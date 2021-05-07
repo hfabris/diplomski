@@ -7,15 +7,16 @@ import networkx
 # in case of error return -1
 def reboot_host(agent, args):
     try:
-        host_name = args[0]
-        network = args[1]
+        network = args[0]
+        employee = args[1]
 
+        host_name = employee.get_component()
         component = network.get_component(host_name)
 
         # flush credentials
-        for account in component.get_active_accounts():
-            component.remove_active_account(account)
+        component.remove_all_active_accounts()
         return 1
+
     except:
         return -1
 
@@ -27,18 +28,20 @@ def reboot_host(agent, args):
 # if the preconditions are not satisfied or error, return -1
 def user_login_to_host(agent, args):
     try:
-        host_name = args[0]
-        network = args[1]
+        # host_name = args[0]
+        network = args[0]
+        employee = args[1]
 
+        host_name = employee.get_component()
         component = network.get_component(host_name)
 
-        if (not component.is_account_active(agent.get_name())) and (host_name in agent.get_knowledge()) :
+        if (not component.is_account_active(employee.get_name())): #and (host_name in agent.get_knowledge()) :
             
             # if the component is not active (it has zero active accounts), set it to active
             if component.get_status() == False:
                 component.set_status(True)
             # add agent to the list of active account on component
-            component.add_active_account(agent)
+            component.add_active_account(employee.get_name())
 
             return 1
         return 0
@@ -47,20 +50,21 @@ def user_login_to_host(agent, args):
 
 
 # action: open email
-# preconditions: agent has unread emails
+# preconditions: employee has unread emails and employee is loged in to his host
 # postconditions: one less unread email, if the read email is malicious, attacker gains access to component
 def open_email(agent, args):
     try:
-        host_name = args[0]
-        network = args[1]
+        network = args[0]
+        employee = args[1]
+        employees = args[2]
 
-        assert agent.name == "gray_agent" or agent.name == "defender"
-
+        employee_component = network.get_component(employee.get_component())
+    
         #check preconditions
-        if agent.get_unread_emails != 0:
+        if employee_component.get_status() == True and employee.get_unread_emails() != []:
             # execute action
             while True:
-                oldest_unread = agent.get_oldest_unread_email()
+                oldest_unread = employee.get_oldest_unread_email()
                 if oldest_unread == "malicious" and random.randint(0,100) % 5 == 0:
                     print("opened malicious")
                     return 1
@@ -68,14 +72,41 @@ def open_email(agent, args):
                     # attacker.add_access(component)
                     # agent opened malicious email, attacker got access to his station
                 elif oldest_unread != "malicious":
-                    print("email read")
+                    print("email {} read".format(oldest_unread))
                     # agent opened non-malicious email, do nothing
                     return 1
                 else:
-                    agent.add_unread_email(oldest_unread)
+                    employee.add_unread_email(oldest_unread)
+        return 0
     except:
         return -1
-    return -1
+
+
+# action: send email
+# preconditions: employee is loged in
+# postconditions: employee sent email
+def send_email(agent, args):
+    try:
+
+        network = args[0]
+        employee = args[1]
+        employees = args[2]
+
+        employee_component = network.get_component(employee.get_component())
+        
+        if employee_component.get_status() == True:
+            while True:
+                receiver = random.choice(list(employees.values()))
+                if receiver != employee: break
+
+            print("Employee {} sent email to employee {}".format(employee.get_name(), receiver.get_name()))
+            receiver.add_unread_email(employee.get_name())
+
+            return 1
+        return 0
+
+    except:
+        return -1
 
 
 # action: browsing the internet
@@ -84,13 +115,13 @@ def open_email(agent, args):
 # def browser_internet(agent, host_name, network, attacker):
 def browser_internet(agent, args):
     try:
-        host_name = args[0]
-        network = args[1]
+        network = args[0]
+        employee = args[1]
 
         # agent is "visiting" random websites
         websites = ["google", "reddit", "news", "malicious", "facebook", "sport", "other random webpage"]
         visited_website = websites[random.randint(0, len(websites)-1)]
-        print("Agent is browsing {}".format(visited_website))
+        print('Employee "{}" is browsing {}'.format(employee.get_name(), visited_website))
 
         # if the website is malicious, attacker gains access to the system
         if visited_website == "malicious":
@@ -110,22 +141,33 @@ def open_connection_between_hosts(agent, args):
 
     try:
 
-        host_from = args[0]
-        host_to = args[1]
-        network = args[2]
+        network = args[0]
+        employee = args[1]
+        employees = args[2]
 
-        component_from = network.get_component(host_from)
-        component_to = network.get_component(host_to)
-        
-        name_from = "\n".join(host_from.split("_"))
-        name_to = "\n".join(host_to.split("_"))
+        while True:
+            employee_to = random.choice(list(employees.values()))
+            if employee_to != employee: break
 
-        if networkx.algorithms.shortest_paths.generic.has_path(network.get_graph(), name_from, name_to) and \
-            component_from.get_status() and component_to.get_status() and component_from.is_account_active(agent):
-            print("Connection made between hosts {} and {}".format(component_from.get_name(), component_to.get_name()))
-            component_from.add_active_connection(component_to.get_name(), agent)
-            component_to.add_active_connection(component_from.get_name(), agent)
+        employee_from_component = network.get_component(employee.get_component())
+        employee_to_component = network.get_component(employee_to.get_component())
+
+        name_from = "\n".join(employee.get_component().split("_"))
+        name_to = "\n".join(employee_to.get_component().split("_"))
+
+        if networkx.algorithms.shortest_paths.generic.has_path(network.get_graph(), name_from, name_to) \
+            and employee_from_component.get_status() and employee_to_component.get_status() \
+            and employee_from_component.is_account_active(employee.get_name()):
+
+            employee_from_component.add_active_connection(employee_to_component.get_name(), (employee.get_name(), employee_to.get_name()))
+            employee_to_component.add_active_connection(employee_from_component.get_name(), (employee.get_name(), employee_to.get_name()))
+            
+            employee.add_connections(employee_to)
+            employee_to.add_connections(employee)
+            
+            print("Connection made between hosts {} and {}".format(employee_from_component.get_name(), employee_to_component.get_name()))
             return 1
+
         return 0
     except:
         return -1
@@ -137,17 +179,31 @@ def open_connection_between_hosts(agent, args):
 def close_connection_between_hosts(agent, args):
 
     try:
-        host_from = args[0]
-        host_to = args[1]
-        network = args[2]
+        network = args[0]
+        employee = args[1]
+        employees = args[2]
 
-        component_from = network.get_component(host_from)
-        component_to = network.get_component(host_to)
+        employee_component = network.get_component(employee.get_component())
+        
+        employee_connections = employee.get_active_connections()
+        component_connections = employee_component.get_active_connections()
 
-        if (component_to.get_name(),agent) in component_from.get_active_connections() and (component_from.get_name(),agent) in component_to.get_active_connections():
-            component_from.remove_active_connection(component_to.get_name(), agent)
-            component_to.remove_active_connection(component_from.get_name(), agent)
+        if employee_connections != []:
+            employee_close_connection_with = employees[employee_connections[random.randint(0, len(employee_connections)-1)]]
+            
+            employee_close_connection_with_name = employee_close_connection_with.get_name()
+            employee_close_connection_with_component = network.get_component(employee_close_connection_with.get_component())
+            
+            employee.remove_connection(employee_close_connection_with_name)
+            employee_close_connection_with.remove_connection(employee.get_name())
+            
+            employee_component.remove_active_connection(employee_close_connection_with_component, employee.get_name(), employee_close_connection_with_name)
+            employee_close_connection_with_component.remove_active_connection(employee_component, employee_close_connection_with_name, employee.get_name())
+            
+            print("Connection closed between employee {} and {}".format(employee.get_name(), employee_close_connection_with_name))
+            
             return 1
+
         return 0
     except:
         return -1
@@ -256,16 +312,16 @@ def enumerate_host(agent, args):
 # action: exfiltrate data from host X
 # preconditions: agent is attacker and agent has escalated priviledges on host X, enumerated host X and did not already exfiltrated host X
 # postconditions: agent exfiltrated host X
-def exfiltrate(agent, args):
+def exfiltrate_data(agent, args):
 
     try:
 
         host_name = args[0]
-        network = args[0]
+        network = args[1]
 
-        if agent.get_name == "attacker" and agent.get_priviledge_level(host_name) == host_name.get_highest_priviledge() and \
-
-            agent.is_enumerated(host_name) and not agent.is_exfiltrated(host_name):
+        if agent.get_name == "attacker" and agent.get_priviledge_level(host_name) == host_name.get_highest_priviledge() \
+            and agent.is_enumerated(host_name) and not agent.is_exfiltrated(host_name):
+            
             agent.add_exfiltrated(host_name)
             print("Host {} exfiltrated".format(host_name))
             return 1
@@ -274,6 +330,92 @@ def exfiltrate(agent, args):
 
     except:
         return -1
+
+
+# action: lateral movement to host X using account A
+# preconditions: agent is attacker and agent has foothold on host Y, know X and Y are connected, knows credentials of A
+#    escalated priviledges on Y, know that A can remotely login to X, and not have foothold on X
+# postconditions: have foothold on X
+# TO DO
+def lateral_movement(agent,args):
+
+    try:
+
+        host_name = args[0]
+        network = args[1]
+        account = args[2]
+
+        
+
+
+        return 0
+    except:
+        return -1
+
+
+# action: run Exploit E on host X
+# preconditions: agent is attacker, agent has foothold on Y, know X and Y are connected, does not have foothold on X, 
+#    and did not tried exploiting X with E before
+# postconditions: have foothold on X if X is vulnerable with E
+def run_Exploit(agent, args):
+
+    try:
+
+        host_X_name = args[0]
+        host_Y_name = args[1]
+        network = args[2]
+        exploit = args[3]
+
+        name_Y = "\n".join(host_X_name.split("_"))
+        name_X = "\n".join(host_Y_name.split("_"))
+
+        if agent.get_name() == "attacker" and host_Y_name in agent.get_knowledge()["established_footholds"] \
+            and ( (host_X_name, host_Y_name) in agent.get_knowledge()["connected"] or (host_Y_name, host_X_name) in agent.get_knowledge()["connected"] ) \
+            and host_X_name not in agent.get_knowledge()["established_footholds"] :
+
+            component_X = network.get_component(host_X_name)
+            if component_X.is_vulnerable(exploit):
+                agent.add_foothold(component_X)
+                return 1
+            return 2
+
+        return 0
+
+    except:
+        return -1
+
+
+# action: discover admin accounts on host X
+# preconditions: agent is attacker, agent has foothold on Y, Y and X are connected, agent does not have foothold on X or probed accounts on X
+# postconditions: agents probed accounts on host X, knows admin accounts on X
+def account_discovery(agent, args):
+
+    try:
+
+        host_X_name = args[0]
+        host_Y_name = args[1]
+        network = args[2]
+
+        name_X = "\n".join(host_from.split("_"))
+        name_Y = "\n".join(host_to.split("_"))
+
+        if agent.get_name() == "attacker" and ( host_Y_name in agent.get_knowledge()["established_footholds"] ) \
+            and networkx.algorithms.shortest_paths.generic.has_path(network.get_graph(), name_X, name_Y) \
+            and ( host_X_name not in agent.get_knowledge()["established_footholds"] ) \
+            and ( host_X_name in agent.get_knowledge()["probed_accounts"] ):
+
+            agent.add_knowledge("probed_accounts", host_X_name)
+
+            component_X = network.get_component(host_X_name)
+            agent.add_knowledge("local_admins", (component_X.get_name(), component_X.get_admins() ))
+            return 1
+
+        return 0
+
+    except:
+        return -1
+
+
 
 
 ''' action template

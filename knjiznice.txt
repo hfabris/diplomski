@@ -10,6 +10,11 @@ json:
 	- https://pypi.org/project/jsons/
 	- knjižnica korištena za čitanje ulaznih datoteka koje su predane kao ulazni argumenti i koje su u json formatu i predstavlja podatke iz tih datoteka koristeći rječnike
 
+random:
+	- https://docs.python.org/3/library/random.html
+	- knjižnica koja se koristi za generiranje slučajnih brojeve
+	- u radu se koristi za generiranje slučajnih brojeva zaposlenika i za slučajan odabir nekog elementa unutar list
+
 PyQt5:
 	- https://pypi.org/project/PyQt5/
 	- knjižnica je python sučelje GUI knjižnice Qt
