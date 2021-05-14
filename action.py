@@ -57,26 +57,32 @@ def open_email(agent, args):
         network = args[0]
         employee = args[1]
         employees = args[2]
+        attacker = args[3]["attacker"]
 
         employee_component = network.get_component(employee.get_component())
     
         #check preconditions
-        if employee_component.get_status() == True and employee.get_unread_emails() != []:
+        if  employee_component.get_status() == True and \
+            employee_component.is_account_active(employee.get_name()) and \
+            employee.get_unread_emails() != []:
+
             # execute action
             while True:
-                oldest_unread = employee.get_oldest_unread_email()
-                if oldest_unread == "malicious" and random.randint(0,100) % 5 == 0:
+                # oldest_unread = employee.get_oldest_unread_email()
+                random_email = employee.get_random_email()
+                if random_email == "attacker":
                     print("opened malicious")
+                    attacker.add_foothold(employee_component)
                     return 1
                     # component = network.get_component(host_name)
                     # attacker.add_access(component)
                     # agent opened malicious email, attacker got access to his station
-                elif oldest_unread != "malicious":
-                    print("email {} read".format(oldest_unread))
+                elif random_email != "attacker":
+                    print("\nemail {} read\n".format(random_email))
                     # agent opened non-malicious email, do nothing
                     return 1
                 else:
-                    employee.add_unread_email(oldest_unread)
+                    employee.add_unread_email(random_email)
         return 0
     except:
         return -1
@@ -94,7 +100,7 @@ def send_email(agent, args):
 
         employee_component = network.get_component(employee.get_component())
         
-        if employee_component.get_status() == True:
+        if employee_component.get_status() == True and employee_component.is_account_active(employee.get_name()):
             while True:
                 receiver = random.choice(list(employees.values()))
                 if receiver != employee: break
@@ -110,26 +116,32 @@ def send_email(agent, args):
 
 
 # action: browsing the internet
-# preconditions: component connected to internet
+# preconditions: component connected to internet, user is logged in
 # postconditions: if the visited website is malicious, attacker gains access
 # def browser_internet(agent, host_name, network, attacker):
 def browser_internet(agent, args):
     try:
         network = args[0]
         employee = args[1]
+        attacker = args[3]["attacker"]
 
-        # agent is "visiting" random websites
-        websites = ["google", "reddit", "news", "malicious", "facebook", "sport", "other random webpage"]
-        visited_website = websites[random.randint(0, len(websites)-1)]
-        print('Employee "{}" is browsing {}'.format(employee.get_name(), visited_website))
+        employee_component = network.get_component(employee.get_component())
 
-        # if the website is malicious, attacker gains access to the system
-        if visited_website == "malicious":
-            # component = network.get_component(host_name)
-            # attacker.add_access(component)
-            print("Attacker got access to component {}".format(host_name))
+        if employee_component.get_status() == True and employee_component.is_account_active(employee.get_name()):
+            # agent is "visiting" random websites
+            websites = ["google", "reddit", "news", "malicious", "facebook", "sport", "other random webpage"]
+            visited_website = websites[random.randint(0, len(websites)-1)]
+            print('Employee "{}" is browsing {}'.format(employee.get_name(), visited_website))
 
-        return 1
+            # if the website is malicious, attacker gains access to the system
+            if visited_website == "malicious":
+                # component = network.get_component(host_name)
+                # attacker.add_access(component)
+                attacker.add_foothold(employee_component)
+                print("Attacker got access to component {}".format(employee_component.name))
+
+            return 1
+        return 0
     except:
         return -1
 
@@ -165,7 +177,7 @@ def open_connection_between_hosts(agent, args):
             employee.add_connections(employee_to)
             employee_to.add_connections(employee)
             
-            print("Connection made between hosts {} and {}".format(employee_from_component.get_name(), employee_to_component.get_name()))
+            # print("Connection made between hosts {} and {}".format(employee_from_component.get_name(), employee_to_component.get_name()))
             return 1
 
         return 0
@@ -188,7 +200,7 @@ def close_connection_between_hosts(agent, args):
         employee_connections = employee.get_active_connections()
         component_connections = employee_component.get_active_connections()
 
-        if employee_connections != []:
+        if employee_component.is_account_active(employee.get_name()) and employee_connections != []:
             employee_close_connection_with = employees[employee_connections[random.randint(0, len(employee_connections)-1)]]
             
             employee_close_connection_with_name = employee_close_connection_with.get_name()
@@ -250,26 +262,42 @@ def delete_account(agent, args):
         return -1
 
 
+
+
+
+
+
+
+
 # action: dump credentials of host X
 # preconditions: agent is attacker and has escalated foothold on host X
 # postconditions: learn all credentials of active users on host X
 def dump_credentials(agent, args):
     
     try:
-        host_name = args[0]
-        network = args[1]
-        component = network.get_component(host_name)
+        # host_name = args[0]
+        # network = args[1]
+        # component = network.get_component(host_name)
 
-        if agent.get_name() == "attacker" and agent.get_priviledge_level() > component.get_highest_priviledge():
+        network = args[0]
+        component = agent.strategy.chose_component(agent, [agent.compromise["escalated"]] )
+        
+        # employee = args[1]
+        # employees = args[2]
+        # agents = args[3]
+        attacker = args[3]["attacker"]
+
+        if agent.name == "attacker" and component in attacker.compromise["escalated"]:
 
             active_accounts = component.get_active_accounts()
-            agent.add_knowledge()
+            agent.add_knowledge("active_connections", active_accounts)
             return 1
 
         return 0
 
     except:
         return -1
+
 
 # action: priviledge escalation on host X
 # preconditions: agent is attacker and attacker has to have low-level priviledge on host X
@@ -277,15 +305,23 @@ def dump_credentials(agent, args):
 def escalate_priviledges(agent, args):
 
     try:
-        host_name = args[0]
-        network = args[1]
 
-        if agent.get_name() == "attacker" and agent.get_priviledge_level(host_name) != 0:
-            agent.set_priviledge_level(self, host_name, agent.get_priviledge_level(host_name) + 1)
+        network = args[0]
+        # get list of all components attacker has foothold on, but did not already escalated priviledges
+        footholds_not_escalated = [x for x in agent.compromise["footholds"] if x not in agent.compromise["escalated"]]
+       
+        # chose one component to escalate priviledges on
+        component = agent.strategy.chose_component([footholds_not_escalated])
+
+        if agent.name == "attacker" and component in agent.compromise["footholds"] \
+            and component not in agent.compromise["escalated"]:
+            agent.add_compromise("escalated", component)
+            # agent.set_priviledge_level(self, host_name, agent.get_priviledge_level(host_name) + 1)
             return 1
         return 0
     except:
         return -1
+
 
 # action: enumerate host X
 # preconditions: agent is attacker and agent has escalated priviledges on host X, and agent did not already enumerated host X
@@ -294,20 +330,31 @@ def enumerate_host(agent, args):
 
     try:
 
-        host_name = args[0]
-        network = args[1]
+        network = args[0]
+        attacker = args[3]["attacker"]
 
-        if agent.get_name == "attacker" and agent.get_priviledge_level(host_name) == host_name.get_highest_priviledge() \
-            and host_name not in agent.enumerated():
+        # get list of all components attacker has foothold on, but did not already enumerated
+        footholds_not_enumerated = [x for x in agent.compromise["escalated"] if x not in agent.compromise["enumerated"] ]
 
-            agent.add_enumerated(host_name)
-            agent.add_knowledge("active_connections", host_name.get_active_connections())
+        # chose one component to enumerate
+        component = agent.strategy.chose_component([footholds_not_enumerated])
+
+        if agent.name == "attacker" and component in attacker.compromise["escalated"] \
+            and component not in attacker.compromise["enumerated"]:
+
+            agent.add_compromise("enumerated", component)
+            for active_connection in component.active_connections:
+                agent.add_knowledge("active_connections", (component.name, active_connection))
+            for connected_component in component.connected_components:
+                agent.add_knowledge("connected", (component.name, connected_component))
+                
             return 1
 
         return 0
 
     except:
         return -1
+
 
 # action: exfiltrate data from host X
 # preconditions: agent is attacker and agent has escalated priviledges on host X, enumerated host X and did not already exfiltrated host X
@@ -318,6 +365,11 @@ def exfiltrate_data(agent, args):
 
         host_name = args[0]
         network = args[1]
+
+        # network = args[0]
+        # employee = args[1]
+        # employees = args[2]
+        # agents = args[3]
 
         if agent.get_name == "attacker" and agent.get_priviledge_level(host_name) == host_name.get_highest_priviledge() \
             and agent.is_enumerated(host_name) and not agent.is_exfiltrated(host_name):
@@ -416,6 +468,25 @@ def account_discovery(agent, args):
         return -1
 
 
+# action: initiall access
+# preconditions: None
+# postconditions: attacker sent malicious emails to random employees
+def initial_access(agent, args):
+
+    try:
+
+        network = args[0]
+        employees = args[2]
+
+        sent_emails = set()
+        random_employees = random.choices(list(employees.values()), k = (len(employees) // 5))
+
+        for random_employee in random_employees:
+            random_employee.add_unread_email(agent.name)
+
+        return 1
+    except:
+        return -1
 
 
 ''' action template
@@ -424,6 +495,17 @@ def account_discovery(agent, args):
 # postconditions: [postconditions that happen once the action is successfully executed]
 def action_name(agent, args):
 
+    args = [
+        network,
+        employee/agent who is executing action,
+        list of all employees,
+        list of all agents
+       ]
+    network = args[0]
+    employee = args[1]
+    employees = args[2]
+    agents = args[3]
+    
     try:
 
         get arguments

@@ -1,5 +1,6 @@
 import strategies
 import action
+import random
 
 class agent:
 
@@ -7,12 +8,10 @@ class agent:
         try:
             self.name = name
             self.action_list = info["actions"]
-            self.strategy = info["strategy"]
-
-            # check if the strategy exists
-            # strategy_name = getattr(strategies, self.strategy) 
-            # strategy_name(self.action_list)
-
+            
+            self.strategy = getattr(strategies, info["strategy"])
+            self.strategy = self.strategy(self.action_list)
+            
             self.knowledge = info["knowledge"]  # turn to dictionary
             self.tools = info["tools"]
 
@@ -36,16 +35,22 @@ class agent:
     def get_tools(self):
         return self.tools
 
-    def chose_action(self):
-        strategy_name = getattr(strategies, self.strategy)
-        return strategy_name(self.action_list)
+    def chose_action(self, network):
+        return self.strategy.chose_action()
 
-    def execute_action(self, action_name, args):
+    def execute_action(self, action_names, args):
 
-        # print("Action {} execution called".format(action_name) )
+        for action_name in action_names:
+            
+            action_call = getattr(action, action_name)
+            action_return = action_call(self,args)
+            if action_return == 1:
+                self.strategy.update_last_action(action_name)
+                print("Executed action {}".format(action_name))
+                return 1
+                
+        return 0
 
-        action_call = getattr(action, action_name)
-        return action_call(self, args)
 
 
 class employee():
@@ -89,6 +94,12 @@ class employee():
     def get_unread_emails(self): 
         return self.unread_emails
 
+    def get_random_email(self):
+        if self.unread_emails != 0:
+            random_email = random.choice(self.unread_emails)
+            return random_email
+        return ""
+
     def get_oldest_unread_email(self):
         if self.unread_emails != 0:
             oldest = self.unread_emails[0]
@@ -119,11 +130,11 @@ class attacker(agent):
         self.knowledge["active_connections"] = []       # list of active connections attacker knows
         self.knowledge["remote"] = []                   # list of tuples, (account_A, component_X), where account_A is authorized to remotely log in to component_X 
         
-        self.compromise["established_footholds"] = []   # list of components attacker has established foothold on 
+        self.compromise["footholds"] = []               # list of components attacker has established foothold on 
         self.compromise["probed_host"] = []             # list of hosts attacker has probed to find admins
         self.compromise["exfiltrated"] = []             # list of components attacker has exfiltrated data from
         self.compromise["enumerated"] = []              # list of components attacker has enumerated 
-        self.compromise["escalated"] = [] 
+        self.compromise["escalated"] = []               # list of components attacker has escalated footholds on
         self.compromise["exploited"] = []               # list of tuples, (host_X, exploit_E), where attacker has tried to exploit host_X with exploit_E
         
         self.current_component = None
@@ -167,6 +178,8 @@ class attacker(agent):
     def set_current_component(self, component):
         self.current_component = component
 
+    def add_foothold(self, component):
+        self.compromise["footholds"].append(component)
 
 class defender(agent):
 

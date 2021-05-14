@@ -10,6 +10,7 @@ import random
 import strategies
 
 # python main.py --agents agent.txt --actions actions.txt --system model_sustava.txt
+# python main.py --agents agent.txt  --system model_sustava.txt
 def main():
 
     # Add parser to parse input arguments
@@ -18,15 +19,15 @@ def main():
 
     parser.add_argument('--agents', metavar='agents', nargs=1, help='an imput file with agents descriptions', required=True)
     parser.add_argument('--system', metavar='system', nargs=1, help='an imput file with system descriptions', required=True)
-    parser.add_argument('--actions', metavar='actions', nargs=1, help='an imput file with actions descriptions', required=True)
+    # parser.add_argument('--actions', metavar='actions', nargs=1, help='an imput file with actions descriptions', required=True)
 
     args = parser.parse_args()
 
     print(args.agents[0])
 
     # Read input arguments and parse json files
-    with open(args.actions[0]) as actions_file:
-        actions_list = json.loads(actions_file.read())
+    # with open(args.actions[0]) as actions_file:
+        # actions_list = json.loads(actions_file.read())
     with open(args.agents[0]) as agents_file:
         agents_list = json.loads(agents_file.read())
     with open(args.system[0]) as system_file:
@@ -58,10 +59,10 @@ def main():
                 employees[employee.get_name()] = employee
 
 
-    print(employees, len(employees))
+    # print(employees, len(employees))
 
     random_employee = random.choice(list(employees.values()))
-    print(random_employee.get_name(), random_employee.get_component())
+    # print(random_employee.get_name(), random_employee.get_component())
 
     random_component = network_list.get_component(random_employee.get_component())
     
@@ -69,14 +70,38 @@ def main():
         # print(component.get_status(), component.get_active_accounts())
 
     gray = agents["gray_agent"]
+    attacker = agents["attacker"]
 
-    # for i in range(5):
-    for employee in employees:
-        employee = employees[employee]
-        gray.execute_action("user_login_to_host", [network_list, employee, employees])
-        gray.execute_action("send_email", [network_list, employee, employees])
+    for i in range(5):
+        for employee in employees:
+            employee = employees[employee]
+            
+            print("\n{}".format(employee.name))
+            action_list = gray.chose_action(network_list)
+            action_return = gray.execute_action(action_list, [network_list, employee, employees, agents])
+            if action_return == 0:
+                print("Nothing executed")
+        attacker.execute_action(["initial_access"], [network_list, employee, employees, agents])
+
+    # print(attacker)
+    if attacker.compromise["footholds"] != []:
+        print("attacker has footholds")
+        attacker.execute_action(["escalate_priviledges"], [network_list, employee, employees, agents])
+        attacker.execute_action(["enumerate_host"], [network_list, employee, employees, agents])
         
-        gray.execute_action("open_connection_between_hosts", [network_list, employee, employees])
+
+    print(attacker.compromise)
+    print(attacker.knowledge)
+        # print(employee.name, action_return)
+        # print(employee.get_name(), action_return)
+        
+        # print(employee)
+        # print(gray.chose_action(network_list))
+        
+        # gray.execute_action("user_login_to_host", [network_list, employee, employees])
+        # gray.execute_action("send_email", [network_list, employee, employees])
+        
+        # gray.execute_action("open_connection_between_hosts", [network_list, employee, employees])
         # print(network_list.get_component(employee.get_component()).get_active_accounts())
                 
         # print("\n\n")
@@ -91,19 +116,19 @@ def main():
         # gray.execute_action("reboot_host", [network_list, employee])
 
 
-    for component in network_list.get_user_components():  
-        print(component.get_status(), component.get_active_accounts(), component.get_active_connections())
+    # for component in network_list.get_user_components():  
+        # print(component.get_status(), component.get_active_accounts(), component.get_active_connections())
     # strategy_name = getattr(strategies, gray.get_strategy())
     # strategy_instance = strategy_name(gray.get_actions(), network_list) 
 
-    for employee in employees:
+    # for employee in employees:
         # print("Start component")
-        employee = employees[employee]
+        # employee = employees[employee]
         # print(employee.get_active_connections(), employee.get_name())
         # print(network_list.get_component(employee.get_component()).get_active_connections())
         # sum += len(employee.get_active_connections())
         # print(gray.execute_action("close_connection_between_hosts", [network_list, employee, employees]))
-        gray.execute_action("close_connection_between_hosts", [network_list, employee, employees])
+        # gray.execute_action("close_connection_between_hosts", [network_list, employee, employees])
     
         # print(employee.get_active_connections(), employee.get_name())
         # print(network_list.get_component(employee.get_component()).get_active_connections())
