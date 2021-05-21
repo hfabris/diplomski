@@ -12,7 +12,7 @@
 			],
 		"strategy"	:	"Random",
 		"knowledge"	:	{},
-		"tools"	:	[]
+		"tools"	:	{}
 	},
 	"attacker" :
 	{
@@ -29,10 +29,12 @@
 			],
 		"strategy"	:	"Random",
 		"knowledge"	:	{},
-		"tools"		:	[
-			"CVE-2018-1111",
-			"CVE-2019-0211"
-			]
+		"tools"		:	{
+			"exploits" : {
+				"CVE-2018-1111" : "Operacijski sustav Red Hat Enterprise Linux v7.3",
+				"CVE-2019-0211" : "Apache HTTP server v2.4"
+				}
+			}
 	},
 	"defender" :
 	{
@@ -43,9 +45,9 @@
 			],
 		"strategy"	:	"Random",
 		"knowledge"	:	{},
-		"tools"		:	[
-			"admin password"
-			]
+		"tools"		:	{
+			"admin password" : "Evfr2EWC"
+			}
 	}
 	
 	

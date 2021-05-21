@@ -23,6 +23,7 @@ class network_component(component):
     def __init__(self, id, info):
         try:
             super(network_component, self).__init__(id, info["name"], info["connected_components"])
+            self.user_component = False
         except:
             print("Invalid network component {} description".format(id))
 
@@ -42,7 +43,8 @@ class user_component(component):
             self.worker_name = info["worker_name"]
             self.priviledge_level = info["priviledge_level"]
             self.domains = info["domain"]
-            self.vulnerable = info["vulnerable"]
+            self.sensitive = info["sensitive"]
+            self.user_component = True
 
             self.status = False
             self.active_accounts = []
@@ -126,8 +128,24 @@ class user_component(component):
             return 1
         return 0
 
-
-
+    def get_connected_components(self, network):
+        to_visit = set(self.connected_components)
+        visited = set()
+        connected = set()
+        
+        
+        while to_visit:
+            current_comp = network.get_component(to_visit.pop())
+            if current_comp.name not in visited: 
+                visited.add(current_comp.name)
+                if current_comp.user_component == True and current_comp.name != self.name:
+                    connected.add(current_comp.name)
+                
+                for component in current_comp.connected_components:
+                    if component not in visited and component not in to_visit:
+                        to_visit.add(component)
+            
+        return connected
 
 
 

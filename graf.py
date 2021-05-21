@@ -198,7 +198,7 @@ def make_network(network_list):
         name = component.get_name()
         rename = "\n".join(name.split("_"))
         gr.add_node(rename, pos=koordinate[name])
-        connected = component.get_connected_components()
+        connected = component.connected_components
         for connected_component in connected:
             connected_component = "\n".join(connected_component.split("_"))
             gr.add_edge(rename, connected_component, attr_dict = {'color' : "blue"})

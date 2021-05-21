@@ -41,7 +41,7 @@ class agent:
     def execute_action(self, action_names, args):
 
         for action_name in action_names:
-            
+
             action_call = getattr(action, action_name)
             action_return = action_call(self,args)
             if action_return == 1:
@@ -97,6 +97,7 @@ class employee():
     def get_random_email(self):
         if self.unread_emails != 0:
             random_email = random.choice(self.unread_emails)
+            del self.unread_emails[self.unread_emails.index(random_email)]
             return random_email
         return ""
 
@@ -114,15 +115,13 @@ class gray_agent(agent):
         super(gray_agent,self).__init__("gray_agent", info)
 
 
-
-
-
 class attacker(agent):
 
     def __init__(self, info):
         super(attacker,self).__init__("attacker", info)
         self.priviledge_level = {}
         self.compromise = {}
+        self.has_access = False
         
         self.knowledge["credentials"] = []              # list of credentials attacker has found in system
         self.knowledge["connected"] = []                # list of tuples, (component_X, component_Y), where component_X and component_Y are connected
@@ -135,8 +134,8 @@ class attacker(agent):
         self.compromise["exfiltrated"] = []             # list of components attacker has exfiltrated data from
         self.compromise["enumerated"] = []              # list of components attacker has enumerated 
         self.compromise["escalated"] = []               # list of components attacker has escalated footholds on
-        self.compromise["exploited"] = []               # list of tuples, (host_X, exploit_E), where attacker has tried to exploit host_X with exploit_E
-        
+        self.compromise["exploited"] = []               # list of components attacker has tried to exploit with exploits in his toolbox
+
         self.current_component = None
 
     def add_knowledge(self, category, new_knowledge):
@@ -179,6 +178,7 @@ class attacker(agent):
         self.current_component = component
 
     def add_foothold(self, component):
+        self.has_access = True
         self.compromise["footholds"].append(component)
 
 class defender(agent):

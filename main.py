@@ -17,8 +17,7 @@ def main():
     # Neccessary argument to start a program are files with agents, system and actions descriptions
     parser = argparse.ArgumentParser(description='Emulation of Automated Attackers in Cybersecurity')
 
-    parser.add_argument('--agents', metavar='agents', nargs=1, help='an imput file with agents descriptions', required=True)
-    parser.add_argument('--system', metavar='system', nargs=1, help='an imput file with system descriptions', required=True)
+    parser.add_argument('--agents', metavar='agents', nargs=1, help='an input file with agents descriptions', required=True)
     # parser.add_argument('--actions', metavar='actions', nargs=1, help='an imput file with actions descriptions', required=True)
 
     args = parser.parse_args()
@@ -72,6 +71,13 @@ def main():
     gray = agents["gray_agent"]
     attacker = agents["attacker"]
 
+    # login_employees = []
+    # login 50% of all employees in the network
+    # for employee in random.sample(list(employees.keys()), (len(employees) // 2)):
+        # employee = employees[employee]
+        # gray.execute_action("user_login_to_host", [network_list, employee, employees, agents])
+        # login_employees.append(login_employees)
+
     for i in range(5):
         for employee in employees:
             employee = employees[employee]
@@ -82,16 +88,30 @@ def main():
             if action_return == 0:
                 print("Nothing executed")
         attacker.execute_action(["initial_access"], [network_list, employee, employees, agents])
+        # print("\n\n\n{}".format(attacker.has_access))
 
     # print(attacker)
     if attacker.compromise["footholds"] != []:
-        print("attacker has footholds")
+        print("attacker has {} footholds".format(len(attacker.compromise["footholds"])))
+        
         attacker.execute_action(["escalate_priviledges"], [network_list, employee, employees, agents])
         attacker.execute_action(["enumerate_host"], [network_list, employee, employees, agents])
-        
+        attacker.execute_action(["dump_credentials"], [network_list, employee, employees, agents])
+        attacker.execute_action(["exfiltrate_data"], [network_list, employee, employees, agents])
+        attacker.execute_action(["run_exploit"], [network_list, employee, employees, agents])
 
     print(attacker.compromise)
     print(attacker.knowledge)
+    print(attacker.has_access)
+    
+    
+    random_user_component = random.choice(network_list.user_components)
+    
+    print("\n\n")
+    print(random_user_component.get_connected_components(network_list))
+    
+    # for user_comp in network_list.user_components:
+        # print(user_comp.software)
         # print(employee.name, action_return)
         # print(employee.get_name(), action_return)
         

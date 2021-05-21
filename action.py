@@ -50,7 +50,7 @@ def user_login_to_host(agent, args):
 
 
 # action: open email
-# preconditions: employee has unread emails and employee is loged in to his host
+# preconditions: employee has unread emails and employee is loged in to his host and employee can remotely connect to mail server
 # postconditions: one less unread email, if the read email is malicious, attacker gains access to component
 def open_email(agent, args):
     try:
@@ -64,15 +64,26 @@ def open_email(agent, args):
         #check preconditions
         if  employee_component.get_status() == True and \
             employee_component.is_account_active(employee.get_name()) and \
-            employee.get_unread_emails() != []:
+            employee.get_unread_emails() != [] and \
+            "mail_server" in employee.remote0:
+
+            # open connection between employee host and mail server
+            # mail_server = network.get_component("mail_server")
+
+            # employee_component.add_active_connection(mail_server.get_name(), (employee.get_name(), employee_to.get_name()))
+            # mail_server.add_active_connection(employee_component.get_name(), (employee.get_name(), employee_to.get_name()))
+            
+            # employee.add_connections(employee_to)
+            # employee_to.add_connections(employee)
 
             # execute action
             while True:
                 # oldest_unread = employee.get_oldest_unread_email()
                 random_email = employee.get_random_email()
-                if random_email == "attacker":
-                    print("opened malicious")
+                if random_email == "attacker" and not attacker.has_access:
                     attacker.add_foothold(employee_component)
+                    print("Opened malicious. Attacker got access to component {}".format(employee_component.name))
+                    print(attacker.has_access)
                     return 1
                     # component = network.get_component(host_name)
                     # attacker.add_access(component)
@@ -81,8 +92,6 @@ def open_email(agent, args):
                     print("\nemail {} read\n".format(random_email))
                     # agent opened non-malicious email, do nothing
                     return 1
-                else:
-                    employee.add_unread_email(random_email)
         return 0
     except:
         return -1
@@ -134,11 +143,13 @@ def browser_internet(agent, args):
             print('Employee "{}" is browsing {}'.format(employee.get_name(), visited_website))
 
             # if the website is malicious, attacker gains access to the system
-            if visited_website == "malicious":
+            if visited_website == "malicious" and not attacker.has_access:
                 # component = network.get_component(host_name)
                 # attacker.add_access(component)
                 attacker.add_foothold(employee_component)
+                print(attacker.has_access)
                 print("Attacker got access to component {}".format(employee_component.name))
+                print(attacker.has_access)
 
             return 1
         return 0
@@ -195,8 +206,10 @@ def close_connection_between_hosts(agent, args):
         employee = args[1]
         employees = args[2]
 
+        # get current employee component
         employee_component = network.get_component(employee.get_component())
-        
+
+        # get acitve connections for current employee and its component
         employee_connections = employee.get_active_connections()
         component_connections = employee_component.get_active_connections()
 
@@ -273,24 +286,18 @@ def delete_account(agent, args):
 # preconditions: agent is attacker and has escalated foothold on host X
 # postconditions: learn all credentials of active users on host X
 def dump_credentials(agent, args):
-    
-    try:
-        # host_name = args[0]
-        # network = args[1]
-        # component = network.get_component(host_name)
 
+    try:
         network = args[0]
-        component = agent.strategy.chose_component(agent, [agent.compromise["escalated"]] )
-        
-        # employee = args[1]
-        # employees = args[2]
-        # agents = args[3]
+        component = agent.strategy.chose_component([agent.compromise["escalated"]] )
+
         attacker = args[3]["attacker"]
 
         if agent.name == "attacker" and component in attacker.compromise["escalated"]:
 
             active_accounts = component.get_active_accounts()
-            agent.add_knowledge("active_connections", active_accounts)
+            for account in active_accounts:
+                agent.add_knowledge("credentials", account)
             return 1
 
         return 0
@@ -309,7 +316,7 @@ def escalate_priviledges(agent, args):
         network = args[0]
         # get list of all components attacker has foothold on, but did not already escalated priviledges
         footholds_not_escalated = [x for x in agent.compromise["footholds"] if x not in agent.compromise["escalated"]]
-       
+
         # chose one component to escalate priviledges on
         component = agent.strategy.chose_component([footholds_not_escalated])
 
@@ -363,19 +370,20 @@ def exfiltrate_data(agent, args):
 
     try:
 
-        host_name = args[0]
-        network = args[1]
+        network = args[0]
+        attacker = args[3]["attacker"]
 
-        # network = args[0]
-        # employee = args[1]
-        # employees = args[2]
-        # agents = args[3]
+        # get all possible components to extract data from
+        # if the component is enumerated, it was also escalated
+        possible_components = [x for x in agent.compromise["escalated"] if x not in agent.compromise["exfiltrated"]]
 
-        if agent.get_name == "attacker" and agent.get_priviledge_level(host_name) == host_name.get_highest_priviledge() \
-            and agent.is_enumerated(host_name) and not agent.is_exfiltrated(host_name):
-            
-            agent.add_exfiltrated(host_name)
-            print("Host {} exfiltrated".format(host_name))
+        # chose one component to exfiltrate data from
+        component = agent.strategy.chose_component([possible_components])
+
+        if agent.name == "attacker" and component not in agent.compromise["exfiltrated"]:
+
+            agent.add_compromise("exfiltrated", component)
+            print("Host {} exfiltrated".format(component.name))
             return 1
 
         return 0
@@ -386,18 +394,44 @@ def exfiltrate_data(agent, args):
 
 # action: lateral movement to host X using account A
 # preconditions: agent is attacker and agent has foothold on host Y, know X and Y are connected, knows credentials of A
-#    escalated priviledges on Y, know that A can remotely login to X, and not have foothold on X
+#    escalated priviledges on Y, know that A can remotely login to X, and not have foothold on X# preconditions: agent is attacker and agent has foothold on host Y, know X and Y are connected, knows credentials of A
 # postconditions: have foothold on X
-# TO DO
 def lateral_movement(agent,args):
 
     try:
 
-        host_name = args[0]
-        network = args[1]
-        account = args[2]
+        network = args[0]
+        attacker = args[3]["attacker"]
 
+        # get all known credentials
+        known_credentials = agent.knowledge["credentials"]
+
+        # for all accounts in known credentials, get list of components those accounts can remotely login
+        remote_components = [x for x in agent.knowledge["remote"] if x[0] in known_credentials]
+
+        # get list of all components that are connected to those we want to remotely login to
+        known_connected = [x for x in agent.knowledge["connected"] if x in remote_components]
+        # known_connected = []
+        # for connection in agent.knowledge["connected"]:
+            # component_X, component_Y = connection
+            # if component_X in remote_components: known_connected.append(component_Y)
+            # elif component_Y in remote_components: known_connected.append(component_X)
+
+        # get list of all components the attacker has no foothold on, and to which we have account credentials to remotely login
+        no_foothold = [x for x in remote_components if x not in agent.compromise["footholds"]]
         
+        # chose one component to remotely login to and get a foothold
+        component_to_move = agent.strategy.chose_component([no_foothold])
+        
+        # get list of components which are connected to component we want to move to
+        connected_components = []
+        for connection in known_connected:
+            component_X, component_Y = connection
+            if component_X == component_to_move.name: connected_components.append(component_Y)
+            elif component_Y == component_to_move.name: connected_components.append(component_X)
+
+        # if agent.name == "attacker" and component in attacker.compromise["footholds"] \
+            # and component in 
 
 
         return 0
@@ -409,9 +443,51 @@ def lateral_movement(agent,args):
 # preconditions: agent is attacker, agent has foothold on Y, know X and Y are connected, does not have foothold on X, 
 #    and did not tried exploiting X with E before
 # postconditions: have foothold on X if X is vulnerable with E
-def run_Exploit(agent, args):
+def run_exploit(agent, args):
 
     try:
+
+        network = args[0]
+        agents = args[3]
+
+        print(agent.tools.get("exploits", {}))
+
+        # get list of components attacker has foothold on
+        has_foothold = agent.compromise["footholds"]
+
+        # get list of all components that the attacker does not have foothold on
+        # but are connected to the components to which attacker has foothold on
+        connected_no_foothold = []
+        for connection in agent.knowledge["connected"]:
+            component_X, component_Y = connection
+            component_X = network.get_component(component_X)
+            component_Y = network.get_component(component_Y)
+            if component_X in has_foothold and component_Y.name not in has_foothold: connected_no_foothold.append(component_Y.name)
+            elif component_Y in has_foothold and component_X.name not in has_foothold: connected_no_foothold.append(component_X.name)
+
+        # get list of all components attacker did not tried to exploit before
+        components_not_exploited = [x for x in connected_no_foothold if x not in agent.compromise["exploited"]]
+
+        if agent.name == "attacker" and components_not_exploited != [] and agent.tools.get("exploits", {}) != {}:
+
+            for tool in agent.tools["exploits"]:
+                vulnerable_software = agent.tools["exploits"][tool]
+                
+                for component in components_not_exploited:
+                    component = network.get_component(component)
+                    # if vulnerable_software in component.software:
+                        
+                    print(component.name)
+                    print(component.software)
+
+
+
+            
+            
+            return 1
+
+        return 0    
+
 
         host_X_name = args[0]
         host_Y_name = args[1]
@@ -479,7 +555,7 @@ def initial_access(agent, args):
         employees = args[2]
 
         sent_emails = set()
-        random_employees = random.choices(list(employees.values()), k = (len(employees) // 5))
+        random_employees = random.sample(list(employees.values()), (len(employees) // 5))
 
         for random_employee in random_employees:
             random_employee.add_unread_email(agent.name)
