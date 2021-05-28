@@ -10,8 +10,22 @@ class Random():
         self.last_action = ""
 
     def chose_action(self):
-        random.shuffle(self.actions)
-        return self.actions
+        action_names = list(self.actions.keys())
+        action_weights = list(self.actions.values())
+
+        action_order = []
+
+        while True:
+            chosen_action = random.choices(action_names, weights = action_weights, k=1)[0]
+            chosen_action_index = action_names.index(chosen_action)
+            action_order.append(chosen_action)
+
+            del action_names[chosen_action_index]
+            del action_weights[chosen_action_index]
+
+            if action_names == []: break
+
+        return action_order
 
     def chose_component(self, args):
         list_of_components = args[0]

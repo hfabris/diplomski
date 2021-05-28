@@ -195,7 +195,7 @@ def make_network(network_list):
     gr = nx.DiGraph()
 
     for component in network_list.get_components():
-        name = component.get_name()
+        name = component.name
         rename = "\n".join(name.split("_"))
         gr.add_node(rename, pos=koordinate[name])
         connected = component.connected_components

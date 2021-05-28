@@ -10,7 +10,10 @@
 						"Microsoft office 2016",
 						"Microsoft Edge v40"
 						],
-				"accounts" : [ "user_account" ],
+				"administrators" : [ 
+						"System administrator",
+						"Security operator" 
+					],
 				"max_account_number" : "10",
 				"worker_name" : "Accountant",
 				"priviledge_level" : "",
@@ -27,9 +30,9 @@
 						"Microsoft office 2016",
 						"Microsoft Edge v40"
 						],
-				"accounts" : [ 
-						"user_account", 
-						"administrator_account" 
+				"administrators" : [ 
+						"System administrator",
+						"Security operator"  
 						],
 				"max_account_number" : "10",
 				"worker_name" : "Manager",
@@ -49,7 +52,10 @@
 						"Visual studio 2015",
 						"Python 3.6"
 						],
-				"accounts"	: [ "user_account" ],
+				"administrators"	: [ 
+						"System administrator",
+						"Security operator" 
+					],
 				"max_account_number" : "10",
 				"worker_name" : "Developer",
 				"priviledge_level" : "",
@@ -66,9 +72,9 @@
 						"Microsoft office 2016",
 						"Microsoft Edge v40"
 						],
-				"accounts"	:	[
-						"user_account",
-						"administrator_account"
+				"administrators"	:	[
+						"System administrator",
+						"Security operator" 
 						],
 				"max_account_number" : "3",
 				"worker_name" : "System administrator",
@@ -92,10 +98,8 @@
 						"Microsoft Edge v40",
 						"Python 3.6"
 						],
-				"accounts"	:	[
-						"user_account",
-						"administrator_account",
-						"system_administrator"
+				"administrators"	:	[
+						"Security operator" 
 						],
 				"max_account_number" : "3",
 				"worker_name" : "Security operator",
@@ -113,10 +117,11 @@
 						"Microsoft office 2016",
 						"Microsoft Edge v40"
 						],
-				"accounts" : [ 
-						"user_account", 
-						"administrator_account" 
-						],
+				"administrators" : [ 
+						"System administrator",
+						"Security operator",
+						"Zagreb bank administrator"
+					],
 				"max_account_number" : "1",
 				"worker_name" : "Zagreb bank officer",
 				"priviledge_level" : "",
@@ -133,10 +138,11 @@
 						"Microsoft office 2016",
 						"Microsoft Edge v40"
 						],
-				"accounts" : [ 
-						"user_account", 
-						"administrator_account" 
-						],
+				"administrators" : [ 
+						"System administrator",
+						"Security operator",
+						"Split bank administrator"
+					],
 				"max_account_number" : "1",
 				"worker_name" : "Split bank officer",
 				"priviledge_level" : "",
@@ -153,10 +159,11 @@
 						"Microsoft office 2016",
 						"Microsoft Edge v40"
 						],
-				"accounts" : [ 
-						"user_account", 
-						"administrator_account" 
-						],
+				"administrators" : [ 
+						"System administrator",
+						"Security operator",
+						"Rijeka bank administrator"
+					],
 				"max_account_number" : "1",
 				"worker_name" : "Rijeka bank officer",
 				"priviledge_level" : "",
@@ -173,16 +180,17 @@
 						"Microsoft office 2016",
 						"Microsoft Edge v40"
 						],
-				"accounts"	:	[
-						"user_account",
-						"administrator_account"
-						],
+				"administrators"	:	[
+						"System administrator",
+						"Security operator",
+						"Zagreb bank administrator"
+					],
 				"max_account_number" : "1",
 				"worker_name" : "Zagreb bank administrator",
 				"priviledge_level" : "",
 				"domain" : [ "system" ],
 				"remote" : [
-					"Zagreb_bank_officer_workstation", "Zagreb_bank_counters", "mail_server
+					"Zagreb_bank_officer_workstation", "Zagreb_bank_counters", "mail_server"
 				], 
 				"sensitive" : []
 			},
@@ -195,10 +203,11 @@
 						"Microsoft office 2016",
 						"Microsoft Edge v40"
 						],
-				"accounts"	:	[
-						"user_account",
-						"administrator_account"
-						],
+				"administrators"	:	[
+						"System administrator",
+						"Security operator",
+						"Split bank administrator"
+					],
 				"max_account_number" : "1",
 				"worker_name" : "Split bank administrator",
 				"priviledge_level" : "",
@@ -217,10 +226,11 @@
 						"Microsoft office 2016",
 						"Microsoft Edge v40"
 						],
-				"accounts"	:	[
-						"user_account",
-						"administrator_account"
-						],
+				"administrators"	:	[
+						"System administrator",
+						"Security operator",
+						"Rijeka bank administrator"
+					],
 				"max_account_number" : "1",
 				"worker_name" : "Rijeka bank administrator",
 				"priviledge_level" : "",
@@ -235,7 +245,11 @@
 				"connected_components"	:	[ "Zagreb_regional_branch_switch" ],
 				"ip_address"	:	"192.168.54.60",
 				"software"	:"",
-				"accounts"	:"",
+				"administrators"	:[
+						"System administrator",
+						"Security operator",
+						"Zagreb bank administrator"
+					],
 				"max_account_number" : "10",
 				"worker_name" : "Zagreb bank official",
 				"priviledge_level" : "",
@@ -248,7 +262,11 @@
 				"connected_components"	:	[ "Split_regional_branch_switch" ],
 				"ip_address"	:	"192.168.54.110",
 				"software"	:"",
-				"accounts"	:"",
+				"administrators"	:[
+						"System administrator",
+						"Security operator",
+						"Split bank administrator"
+					],
 				"max_account_number" : "10",
 				"worker_name" : "Split bank official",
 				"priviledge_level" : "",
@@ -261,7 +279,11 @@
 				"connected_components"	:	[ "Rijeka_regional_branch_switch" ],
 				"ip_address"	:	"192.168.54.160",
 				"software"	:"",
-				"accounts"	:"",
+				"administrators"	:[
+						"System administrator",
+						"Security operator",
+						"Rijeka bank administrator"
+					],
 				"max_account_number" : "10",
 				"worker_name" : "Rijeka bank official",
 				"priviledge_level" : "",
@@ -277,7 +299,10 @@
 						"Operacijski sustav Windows Server 2012 R2 v6.3",
 						"Proprietary backup server rješenje koje koristi smb"
 						],
-				"accounts"	:	[],
+				"administrators"	: [
+						"System administrator",
+						"Security operator"
+					],
 				"max_account_number" : "0",
 				"worker_name" : "",
 				"priviledge_level" : "",
@@ -293,7 +318,10 @@
 						"Operacijski sustav Windows Server 2012 R2 v6.3",
 						"Internet Information Services v8.5"
 					],
-				"accounts"	:	[],
+				"administrators"	: [
+						"System administrator",
+						"Security operator"
+					],
 				"max_account_number" : "0",
 				"worker_name" : "",
 				"priviledge_level" : "",
@@ -309,7 +337,10 @@
 						"Operacijski sustav Windows Server 2012 R2 v6.3",
 						"SQL Server 2016"
 					],
-				"accounts"	:"",
+				"administrators"	: [
+						"System administrator",
+						"Security operator"
+					],
 				"max_account_number" : "0",
 				"worker_name" : "",
 				"priviledge_level" : "",
@@ -325,7 +356,10 @@
 						"Operacijski sustav Windows Server 2012 R2 v6.3",
 						"SQL server 2016"
 						],
-				"accounts"	:	[],
+				"administrators"	: [
+						"System administrator",
+						"Security operator"
+					],
 				"max_account_number" : "0",
 				"worker_name" : "",
 				"priviledge_level" : "",
@@ -342,7 +376,10 @@
 						"Apache HTTP server v2.4",
 						"Samba v4.6"
 						],
-				"accounts"	:	[],
+				"administrators"	: [
+						"System administrator",
+						"Security operator"
+					],
 				"max_account_number" : "0",
 				"worker_name" : "",
 				"priviledge_level" : "",
@@ -358,7 +395,10 @@
 						"Operacijski sustav Windows Server 2012 R2 v6.3",
 						"Microsoft Exchange Server 2016"
 						],
-				"accounts"	:	[],
+				"administrators"	: [
+						"System administrator",
+						"Security operator"
+					],
 				"max_account_number" : "0",
 				"worker_name" : "",
 				"priviledge_level" : "",
@@ -374,7 +414,7 @@
 						"Operacijski sustav Red Hat Enterprise Linux v7.3",
 						"BIND 9"
 						],
-				"accounts"	:"",
+				"administrators"	: [],
 				"max_account_number" : "0",
 				"worker_name" : "",
 				"priviledge_level" : "",

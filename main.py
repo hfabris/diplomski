@@ -10,13 +10,13 @@ import random
 import strategies
 
 # python main.py --agents agent.txt --actions actions.txt --system model_sustava.txt
-# python main.py --agents agent.txt  --system model_sustava.txt
+# python main.py --agents agent.txt --system model_sustava.txt
 def main():
 
     # Add parser to parse input arguments
     # Neccessary argument to start a program are files with agents, system and actions descriptions
     parser = argparse.ArgumentParser(description='Emulation of Automated Attackers in Cybersecurity')
-
+    parser.add_argument('--system', metavar='system', nargs=1, help='an imput file with system descriptions', required=True)
     parser.add_argument('--agents', metavar='agents', nargs=1, help='an input file with agents descriptions', required=True)
     # parser.add_argument('--actions', metavar='actions', nargs=1, help='an imput file with actions descriptions', required=True)
 
@@ -54,16 +54,21 @@ def main():
                 info["name"] = user_component["worker_name"] + " " + str(i)
                 info["priviledge_level"] = user_component["priviledge_level"]
                 info["domain"] = user_component["domain"]
+                info["remote"] = user_component["remote"]
                 employee = agent.employee(info)
-                employees[employee.get_name()] = employee
+                employees[employee.name] = employee
 
 
+    for component in network_list.user_components:
+        if component.administrators != []:
+            component.add_administrator_accounts(employees)
+    
     # print(employees, len(employees))
 
     random_employee = random.choice(list(employees.values()))
-    # print(random_employee.get_name(), random_employee.get_component())
+    # print(random_employee.name, random_employee.get_component())
 
-    random_component = network_list.get_component(random_employee.get_component())
+    random_component = network_list.get_component(random_employee.component)
     
     # for component in network_list.get_user_components():  
         # print(component.get_status(), component.get_active_accounts())
@@ -78,19 +83,35 @@ def main():
         # gray.execute_action("user_login_to_host", [network_list, employee, employees, agents])
         # login_employees.append(login_employees)
 
-    for i in range(5):
-        for employee in employees:
-            employee = employees[employee]
-            
-            print("\n{}".format(employee.name))
-            action_list = gray.chose_action(network_list)
-            action_return = gray.execute_action(action_list, [network_list, employee, employees, agents])
-            if action_return == 0:
-                print("Nothing executed")
-        attacker.execute_action(["initial_access"], [network_list, employee, employees, agents])
-        # print("\n\n\n{}".format(attacker.has_access))
+    for component in network_list.user_components:
+        print(component.name, component.status, component.active_connections)
 
-    # print(attacker)
+
+    # for i in range(5):
+        # for employee in employees:
+            # employee = employees[employee]
+            
+            # print("\n{}".format(employee.name))
+            # action_list = gray.chose_action(network_list)
+            # action_return = gray.execute_action(action_list, [network_list, employee, employees, agents])
+            # if action_return == 0:
+                # print("Nothing executed")
+        # attacker.execute_action(["initial_access"], [network_list, employee, employees, agents])
+        
+
+    # print("\n" * 5)
+
+    # for component in network_list.user_components:
+        # print(component.name, component.status, component.active_connections)
+
+    empl = employees["System administrator 1"]
+    gray.execute_action(["user_login_to_host"], [network_list, empl, employees, agents])
+    gray.execute_action(["browser_internet"], [network_list, empl, employees, agents])
+    gray.execute_action(["open_connection_between_hosts"], [network_list, empl, employees, agents])
+    print(empl.remote)
+    print(empl.component)
+
+    print(attacker)
     if attacker.compromise["footholds"] != []:
         print("attacker has {} footholds".format(len(attacker.compromise["footholds"])))
         
@@ -99,21 +120,65 @@ def main():
         attacker.execute_action(["dump_credentials"], [network_list, employee, employees, agents])
         attacker.execute_action(["exfiltrate_data"], [network_list, employee, employees, agents])
         attacker.execute_action(["run_exploit"], [network_list, employee, employees, agents])
+        print(attacker.execute_action(["account_discovery"], [network_list, employee, employees, agents]))
+        print(attacker.execute_action(["lateral_movement"], [network_list, employee, employees, agents]))
+
+    print("\n"*3)
 
     print(attacker.compromise)
     print(attacker.knowledge)
     print(attacker.has_access)
     
+
+    # for component in network_list.user_components:
+        # print(component.admin_accounts)
     
-    random_user_component = random.choice(network_list.user_components)
+
+
+    # for c in network_list.get_component(empl.component).active_connections.keys():
+        # c = network_list.get_component(c)
+        # c2 = network_list.get_component(empl.component)
+        # attacker.add_foothold( c )
+        
+        # c.add_active_connection(c2.name, (empl.name, "attacker"))
+        # c2.add_active_connection(c.name, (empl.name, "attacker"))
+
+    # print(network_list.get_component(empl.component).active_connections)
+    # print("\n"*5)
     
-    print("\n\n")
-    print(random_user_component.get_connected_components(network_list))
+    # print(attacker.compromise["footholds"])
+
+
+    # defender = agents["defender"]
+    # print(defender)
+    # defender.execute_action(["check_opened_connections"], [network_list, empl, employees, agents])
+
+
+    # print(attacker.compromise["footholds"])
+    # print(network_list.get_component(empl.component).active_connections)
+    # print(attacker.compromise)
+    
+    
+    
+    
+    
+    
+    # print(network_list.get_component(empl.component).active_connections.keys)
+    # print(network_list.get_component(empl.component).active_connections.keys)
+    
+    
+    # for user_compo in network_list.user_components:
+        # print(user_compo.active_connections)
+   
+    # print(employees)
+    
+    # for employee in employees:
+        # print(employees[employee].remote)
     
     # for user_comp in network_list.user_components:
         # print(user_comp.software)
         # print(employee.name, action_return)
-        # print(employee.get_name(), action_return)
+        # print(employee.name, action_return)
         
         # print(employee)
         # print(gray.chose_action(network_list))
@@ -125,10 +190,10 @@ def main():
         # print(network_list.get_component(employee.get_component()).get_active_accounts())
                 
         # print("\n\n")
-        # print("Employee {} has {} unread emails".format(employee.get_name(), len(employee.get_unread_emails())))
+        # print("Employee {} has {} unread emails".format(employee.name, len(employee.get_unread_emails())))
         # gray.execute_action("open_email", [network_list, employee, employees])
         
-        # print("Employee {} has {} unread emails".format(employee.get_name(), len(employee.get_unread_emails())))
+        # print("Employee {} has {} unread emails".format(employee.name, len(employee.get_unread_emails())))
 
 
     # for employee in employees:
@@ -144,13 +209,13 @@ def main():
     # for employee in employees:
         # print("Start component")
         # employee = employees[employee]
-        # print(employee.get_active_connections(), employee.get_name())
+        # print(employee.get_active_connections(), employee.name)
         # print(network_list.get_component(employee.get_component()).get_active_connections())
         # sum += len(employee.get_active_connections())
         # print(gray.execute_action("close_connection_between_hosts", [network_list, employee, employees]))
         # gray.execute_action("close_connection_between_hosts", [network_list, employee, employees])
     
-        # print(employee.get_active_connections(), employee.get_name())
+        # print(employee.get_active_connections(), employee.name)
         # print(network_list.get_component(employee.get_component()).get_active_connections())
         # print("\n\n")
 
@@ -170,7 +235,7 @@ def main():
 
                 # if action_return == 1:
                     # action_executed = True
-                    # print("{} -> {}".format(agent_name.get_name(), action_name) )
+                    # print("{} -> {}".format(agent_name.name, action_name) )
                 # elif action_return == -1:
                     # print("Error while executing action {}".format(action_name))
 
@@ -192,13 +257,13 @@ def main():
     # gray_agent.execute_action("user_login_to_host", ["accountant_workstation", network_list])
 
     # for component in network_list.get_user_components():
-        # if component.get_name() == "accountant_workstation":
+        # if component.name == "accountant_workstation":
             # print(component.get_active_accounts())
     
     # gray_agent.execute_action("reboot_host", ["accountant_workstation", network_list])
     
     # for component in network_list.get_user_components():
-        # if component.get_name() == "accountant_workstation":
+        # if component.name == "accountant_workstation":
             # print(component.get_active_accounts())
     
     

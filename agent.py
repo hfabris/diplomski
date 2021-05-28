@@ -19,22 +19,6 @@ class agent:
             print("Invalid agent {} description".format(name))
             exit()
 
-
-    def get_name(self):
-        return self.name
-
-    def get_actions(self):
-        return self.action_list
-
-    def get_strategy(self):
-        return self.strategy
-
-    def get_knowledge(self):
-        return self.knowledge
-
-    def get_tools(self):
-        return self.tools
-
     def chose_action(self, network):
         return self.strategy.chose_action()
 
@@ -46,7 +30,7 @@ class agent:
             action_return = action_call(self,args)
             if action_return == 1:
                 self.strategy.update_last_action(action_name)
-                print("Executed action {}".format(action_name))
+                # print("\nExecuted action {}".format(action_name))
                 return 1
                 
         return 0
@@ -62,21 +46,10 @@ class employee():
         self.domain = info["domain"]
         self.active_connections = []
         self.unread_emails = []
-
-    def get_component(self):
-        return self.component
-
-    def get_name(self):
-        return self.name
+        self.remote = info["remote"]
 
     def get_priviledge_level(self):
         return self.priviledge_level
-
-    def get_domain(self):
-        return self.domain
-
-    def get_active_connections(self):
-        return self.active_connections
 
     def add_connections(self, connection):
         self.active_connections.append(connection.get_name())
@@ -90,9 +63,6 @@ class employee():
 
     def add_unread_email(self,sender):
         self.unread_emails.append(sender)
-
-    def get_unread_emails(self): 
-        return self.unread_emails
 
     def get_random_email(self):
         if self.unread_emails != 0:
@@ -130,7 +100,7 @@ class attacker(agent):
         self.knowledge["remote"] = []                   # list of tuples, (account_A, component_X), where account_A is authorized to remotely log in to component_X 
         
         self.compromise["footholds"] = []               # list of components attacker has established foothold on 
-        self.compromise["probed_host"] = []             # list of hosts attacker has probed to find admins
+        self.compromise["probed_accounts"] = []         # list of hosts attacker has probed to find admins
         self.compromise["exfiltrated"] = []             # list of components attacker has exfiltrated data from
         self.compromise["enumerated"] = []              # list of components attacker has enumerated 
         self.compromise["escalated"] = []               # list of components attacker has escalated footholds on
@@ -139,7 +109,8 @@ class attacker(agent):
         self.current_component = None
 
     def add_knowledge(self, category, new_knowledge):
-        self.knowledge[category].append(new_knowledge)
+        if new_knowledge not in self.knowledge[category]:
+            self.knowledge[category].append(new_knowledge)
 
     def add_compromise(self, category, new_compromise):
         self.compromise[category].append(new_compromise)
@@ -171,9 +142,6 @@ class attacker(agent):
     def is_exfiltrated(self, component):
         return component in self.compromise["exfiltrated"]
 
-    def get_current_component(self):
-        return self.current_component
-
     def set_current_component(self, component):
         self.current_component = component
 
@@ -181,13 +149,19 @@ class attacker(agent):
         self.has_access = True
         self.compromise["footholds"].append(component)
 
+    def del_foothold(self, footholds):
+        for foothold in footholds:
+            if foothold in self.compromise["footholds"]:
+                foothold_index = self.compromise["footholds"].index(foothold)
+                del self.compromise["footholds"][foothold_index]
+
+
+
 class defender(agent):
 
     def __init__(self, info):
         super(defender,self).__init__("defender", info)
         self.priviledge_level = 5
-
-    def get_priviledge_level(self): return self.priviledge_level
 
 
 

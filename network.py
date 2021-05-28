@@ -11,12 +11,6 @@ class component:
         except:
             print("Invalid component {} description".format(id))
 
-    def get_id(self): return self.id
-
-    def get_name(self): return self.name
-
-    def get_connected_components(self): return self.connected_components
-
 
 class network_component(component):
     
@@ -38,7 +32,7 @@ class user_component(component):
             super(user_component, self).__init__(id, info["name"], info["connected_components"])
             self.ip_address = info["ip_address"]
             self.software = info["software"]
-            self.accounts = info["accounts"]
+            self.administrators = info["administrators"]
             self.max_account_number = int(info["max_account_number"])
             self.worker_name = info["worker_name"]
             self.priviledge_level = info["priviledge_level"]
@@ -49,23 +43,12 @@ class user_component(component):
             self.status = False
             self.active_accounts = []
             self.active_connections = {}
+            self.admin_accounts = []
 
         except:
             print("Invalid user component {} description".format(id))
 
-    # Methods to get user component informations
-    def get_ip_address(self): return self.ip_address
 
-    def get_software(self): return self.software
-
-    def get_accounts(self): return self.accounts
-
-    def get_domains(self): return self.domains
-
-    def get_status(self): return self.status
-    
-    def get_active_accounts(self): return self.active_accounts
-    
     def is_account_active(self, account):
         if account in self.active_accounts: return True
         return False
@@ -119,9 +102,6 @@ class user_component(component):
         
         self.active_connections[other_component.get_name()] = active_connections
         return 1
-    
-    def get_active_connections(self): 
-        return self.active_connections
 
     def is_vulnerable(self, exploit):
         if exploit in self.vulnerable:
@@ -132,23 +112,29 @@ class user_component(component):
         to_visit = set(self.connected_components)
         visited = set()
         connected = set()
-        
-        
+
         while to_visit:
             current_comp = network.get_component(to_visit.pop())
             if current_comp.name not in visited: 
                 visited.add(current_comp.name)
                 if current_comp.user_component == True and current_comp.name != self.name:
                     connected.add(current_comp.name)
-                
+
                 for component in current_comp.connected_components:
                     if component not in visited and component not in to_visit:
                         to_visit.add(component)
-            
+
         return connected
 
-
-
+    def add_administrator_accounts(self, employees):
+        for employee in employees:
+            employee_name = employee.split(" ")
+            if employee_name[-1].isdigit():
+                employee_name = " ".join(employee_name[:-1])
+            else:
+                employee_name = " ".join(employee_name)
+            if employee_name in self.administrators:
+                self.admin_accounts.append(employee)
 
 
 
@@ -173,23 +159,14 @@ class network_model:
         self.components_names = set( component.name for component in self.components_list )
 
 
-    def get_user_components(self):
-        return self.user_components
-
-    def get_network_components(self):
-        return self.network_components
-
     def get_components(self):
         return self.network_components + self.user_components
 
     def get_component(self, component_name):
         for component in self.components_list:
-            if component.get_name() == component_name:
+            if component.name == component_name:
                 return component
         return -1
 
     def add_graph(self, graph): 
         self.graph = graph
-
-    def get_graph(self): 
-        return self.graph

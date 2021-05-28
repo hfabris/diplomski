@@ -1,48 +1,48 @@
 {
 	"gray_agent" :
 	{
-		"actions"	:	[
-			"reboot_host",
-			"user_login_to_host",
-			"open_connection_between_hosts",
-			"close_connection_between_hosts",
-			"open_email",
-			"send_email",
-			"browser_internet"
-			],
+		"actions"	:	{
+			"reboot_host" : 1,
+			"user_login_to_host" : 1,
+			"open_connection_between_hosts" : 10,
+			"close_connection_between_hosts" : 1,
+			"open_email" : 1,
+			"send_email" : 1,
+			"browser_internet" : 1
+			},
 		"strategy"	:	"Random",
 		"knowledge"	:	{},
 		"tools"	:	{}
 	},
 	"attacker" :
 	{
-		"actions"	:	[
-			"lateral_movement",
-			"dump_credentials",
-			"enumerate_host",
-			"exfiltrate_data",
-			"run_exploit",
-			"escalate_privileges",
-			"defense_evasion",
-			"account_discovery",
-			"initial_access"
-			],
+		"actions"	:	{
+			"lateral_movement" : 1,
+			"dump_credentials" : 1,
+			"enumerate_host" : 1,
+			"exfiltrate_data" : 1,
+			"run_exploit" : 1,
+			"escalate_privileges" : 1,
+			"defense_evasion" : 1,
+			"account_discovery" : 1,
+			"initial_access" : 1
+			},
 		"strategy"	:	"Random",
 		"knowledge"	:	{},
 		"tools"		:	{
 			"exploits" : {
-				"CVE-2018-1111" : "Operacijski sustav Red Hat Enterprise Linux v7.3",
-				"CVE-2019-0211" : "Apache HTTP server v2.4"
+				"CVE-2xxx-xxxy" : "Operacijski sustav Windows 11 v1703",
+				"CVE-2xxx-xxxx" : "Operacijski sustav Windows 10 v1703",
+				"CVE-2019-0211" : "Apache HTTP server v2.4",
+				"CVE-2018-1111" : "Operacijski sustav Red Hat Enterprise Linux v7.3"
 				}
 			}
 	},
 	"defender" :
 	{
-		"actions"	:	[
-			"check_opened_connections",
-			"delete_account",
-			"log_analysis"
-			],
+		"actions"	:	{
+			"check_opened_connections" : 1
+			},
 		"strategy"	:	"Random",
 		"knowledge"	:	{},
 		"tools"		:	{
