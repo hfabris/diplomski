@@ -16,8 +16,8 @@
 					],
 				"max_account_number" : "10",
 				"worker_name" : "Accountant",
-				"priviledge_level" : "",
-				"domain" : [ "system" ],
+				"priviledge_level" : "1",
+				"domain" : [ "Central" ],
 				"remote" : ["mail_server"], 
 				"sensitive" : []
 			},
@@ -36,8 +36,8 @@
 						],
 				"max_account_number" : "10",
 				"worker_name" : "Manager",
-				"priviledge_level" : "",
-				"domain" : [ "system" ],
+				"priviledge_level" : "2",
+				"domain" : [ "Admin" ],
 				"remote" : ["mail_server"], 
 				"sensitive" : []
 			},
@@ -58,8 +58,8 @@
 					],
 				"max_account_number" : "10",
 				"worker_name" : "Developer",
-				"priviledge_level" : "",
-				"domain" : [ "system" ],
+				"priviledge_level" : "1",
+				"domain" : [ "Central" ],
 				"remote" : ["mail_server"], 
 				"sensitive" : []
 			},
@@ -78,12 +78,9 @@
 						],
 				"max_account_number" : "3",
 				"worker_name" : "System administrator",
-				"priviledge_level" : "",
-				"domain" : [ "system" ],
+				"priviledge_level" : "2",
+				"domain" : [ "Central", "Admin" ],
 				"remote" : [
-					"Zagreb_bank_officer_workstation", "Zagreb_bank_counters", "Zagreb_regional_admin_workstation",
-					"Rijeka_bank_officer_workstation", "Rijeka_bank_counters", "Rijeka_regional_admin_workstation",
-					"Split_regional_admin_workstation", "Split_bank_counters", "Split_regional_admin_workstation",
 					"accountant_workstation", "developer_workstation", "mail_server"
 				], 
 				"sensitive" : []
@@ -103,9 +100,16 @@
 						],
 				"max_account_number" : "3",
 				"worker_name" : "Security operator",
-				"priviledge_level" : "",
-				"domain" : [ "system" ],
-				"remote" : ["mail_server"], 
+				"priviledge_level" : "3",
+				"domain" : [],
+				"remote" : [ 
+						"mail_server", "database_server", "sec_op_workstation", "admin_workstation", "dns_server", 
+						"Rijeka_regional_admin_workstation", "Zagreb_regional_admin_workstation", "Rijeka_bank_officer_workstation", 
+						"public_web_server", "Split_bank_officer_workstation", "Split_bank_counters", "Rijeka_bank_counters", 
+						"developer_workstation", "backup_server", "domain_controler", "Zagreb_bank_counters", 
+						"Zagreb_bank_officer_workstation", "manager_workstation", "Split_regional_admin_workstation", 
+						"accountant_workstation" 
+					], 
 				"sensitive" : []
 			},
 			"component6_1" :{
@@ -124,8 +128,8 @@
 					],
 				"max_account_number" : "1",
 				"worker_name" : "Zagreb bank officer",
-				"priviledge_level" : "",
-				"domain" : [ "system" ],
+				"priviledge_level" : "1",
+				"domain" : [ "Zagreb" ],
 				"remote" : ["mail_server"], 
 				"sensitive" : []
 			},
@@ -145,8 +149,8 @@
 					],
 				"max_account_number" : "1",
 				"worker_name" : "Split bank officer",
-				"priviledge_level" : "",
-				"domain" : [ "system" ],
+				"priviledge_level" : "1",
+				"domain" : [ "Split" ],
 				"remote" : ["mail_server"], 
 				"sensitive" : []
 			},
@@ -166,8 +170,8 @@
 					],
 				"max_account_number" : "1",
 				"worker_name" : "Rijeka bank officer",
-				"priviledge_level" : "",
-				"domain" : [ "system" ],
+				"priviledge_level" : "1",
+				"domain" : [ "Rijeka" ],
 				"remote" : ["mail_server"], 
 				"sensitive" : []
 			},
@@ -187,8 +191,8 @@
 					],
 				"max_account_number" : "1",
 				"worker_name" : "Zagreb bank administrator",
-				"priviledge_level" : "",
-				"domain" : [ "system" ],
+				"priviledge_level" : "2",
+				"domain" : [ "Zagreb", "Admin" ],
 				"remote" : [
 					"Zagreb_bank_officer_workstation", "Zagreb_bank_counters", "mail_server"
 				], 
@@ -210,8 +214,8 @@
 					],
 				"max_account_number" : "1",
 				"worker_name" : "Split bank administrator",
-				"priviledge_level" : "",
-				"domain" : [ "system" ],
+				"priviledge_level" : "2",
+				"domain" : [ "Split", "Admin" ],
 				"remote" : [
 					"Split_bank_officer_workstation", "Split_bank_counters", "mail_server"
 				], 
@@ -233,8 +237,8 @@
 					],
 				"max_account_number" : "1",
 				"worker_name" : "Rijeka bank administrator",
-				"priviledge_level" : "",
-				"domain" : [ "system" ],
+				"priviledge_level" : "2",
+				"domain" : [ "Rijeka", "Admin" ],
 				"remote" : [
 					"Rijeka_bank_officer_workstation", "Rijeka_bank_counters", "mail_server"
 				], 
@@ -252,8 +256,8 @@
 					],
 				"max_account_number" : "10",
 				"worker_name" : "Zagreb bank official",
-				"priviledge_level" : "",
-				"domain" : [ "system" ],
+				"priviledge_level" : "1",
+				"domain" : [ "Zagreb" ],
 				"remote" : ["mail_server"], 
 				"sensitive" : []
 			},
@@ -269,8 +273,8 @@
 					],
 				"max_account_number" : "10",
 				"worker_name" : "Split bank official",
-				"priviledge_level" : "",
-				"domain" : [ "system" ],
+				"priviledge_level" : "1",
+				"domain" : [ "Split" ],
 				"remote" : ["mail_server"], 
 				"sensitive" : []
 			},
@@ -286,8 +290,8 @@
 					],
 				"max_account_number" : "10",
 				"worker_name" : "Rijeka bank official",
-				"priviledge_level" : "",
-				"domain" : [ "system" ],
+				"priviledge_level" : "1",
+				"domain" : [ "Rijeka" ],
 				"remote" : ["mail_server"], 
 				"sensitive" : []
 			},
@@ -306,7 +310,7 @@
 				"max_account_number" : "0",
 				"worker_name" : "",
 				"priviledge_level" : "",
-				"domain" : [ "system" ],
+				"domain" : [],
 				"remote" : [], 
 				"sensitive" : []
 			},
@@ -325,7 +329,7 @@
 				"max_account_number" : "0",
 				"worker_name" : "",
 				"priviledge_level" : "",
-				"domain" : [ "system" ],
+				"domain" : [],
 				"remote" : [], 
 				"sensitive" : []
 			},
@@ -344,7 +348,7 @@
 				"max_account_number" : "0",
 				"worker_name" : "",
 				"priviledge_level" : "",
-				"domain" : [ "system" ],
+				"domain" : [],
 				"remote" : [], 
 				"sensitive" : []
 			},
@@ -363,7 +367,7 @@
 				"max_account_number" : "0",
 				"worker_name" : "",
 				"priviledge_level" : "",
-				"domain" : [ "system" ],
+				"domain" : [],
 				"remote" : [], 
 				"sensitive" : []
 			},
@@ -383,7 +387,7 @@
 				"max_account_number" : "0",
 				"worker_name" : "",
 				"priviledge_level" : "",
-				"domain" : [ "system" ],
+				"domain" : [],
 				"remote" : [], 
 				"sensitive" : []
 			},
@@ -402,7 +406,7 @@
 				"max_account_number" : "0",
 				"worker_name" : "",
 				"priviledge_level" : "",
-				"domain" : [ "system" ],
+				"domain" : [],
 				"remote" : [], 
 				"sensitive" : []
 			},
@@ -418,7 +422,7 @@
 				"max_account_number" : "0",
 				"worker_name" : "",
 				"priviledge_level" : "",
-				"domain" : [ "system" ],
+				"domain" : [],
 				"remote" : [], 
 				"sensitive" : []
 			}

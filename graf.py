@@ -7,41 +7,8 @@ from os import environ
 import networkx as nx
 import json
 import network
+import random
 
-koordinate = {
-    "backup_server" : (100,100),
-    "private_web_server" : (100,200),
-    "database_server" : (100,300),
-    "domain_controler" : (100,400),
-    "datacenter_switch" : (300,300),
-    "core_router" : (600,300),
-    "dmz_switch" : (600,200),
-    "wan_switch" : (850,300),
-    "Zagreb_regional_branch_switch" : (850,200),
-    "Split_regional_branch_switch" : (1050,300),
-    "Rijeka_regional_branch_switch" : (1050,450),
-    "distribution_switch" : (600,400),
-    "access_switch_IT" : (400,500),
-    "access_switch_management" : (600,500),
-    "access_switch_accounting" : (800,500),
-    "dns_server" : (400,200),
-    "mail_server" : (400,100),
-    "public_web_server" : (600,100),
-    "Zagreb_bank_counters" : (850,100),
-    "Zagreb_regional_admin_workstation" : (1050,100),
-    "Zagreb_bank_officer_workstation" : (1050,200),
-    "Split_bank_counters" : (1350,200),
-    "Split_regional_admin_workstation" : (1350,300),
-    "Split_bank_officer_workstation" : (1350,400),
-    "Rijeka_bank_counters" : (1350,500),
-    "Rijeka_regional_admin_workstation" : (1350,600),
-    "Rijeka_bank_officer_workstation" : (1050,600),
-    "sec_op_workstation" : (200,500),
-    "admin_workstation" : (200,600),
-    "developer_workstation" : (400,600),
-    "manager_workstation" : (600,600),
-    "accountant_workstation" : (800,600)
-}
 
 def suppress_qt_warnings():
     environ["QT_DEVICE_PIXEL_RATIO"] = "0"
@@ -51,18 +18,23 @@ def suppress_qt_warnings():
 
 class PrettyWidget(QWidget):
 
-    def __init__(self, network_info):
+    def __init__(self, network_info, components_possitions):
 
 
         super(PrettyWidget, self).__init__()
         font = QFont()
         font.setPointSize(16)
         self.network_info = network_info
+        
+        self.height = int(components_possitions["dimensions"]["height"])
+        self.width = int(components_possitions["dimensions"]["width"])
+        self.possitions = components_possitions["components"]
+        
         self.initUI()
 
     def initUI(self):
 
-        self.setGeometry(100, 100, 1400, 700)
+        self.setGeometry(100, 100, self.height, self.width)
         self.center()
         self.setWindowTitle('Network Plot')
 
@@ -74,12 +46,12 @@ class PrettyWidget(QWidget):
         grid.addWidget(self.canvas, 0, 2, 9, 9)
 
         # Create network graph from network informations
-        g = make_network(self.network_info)
+        g = make_network(self.network_info, self.possitions, self.height, self.width)
 
         self.network_info.add_graph(g)
 
         # Make subgraph consisting of user components
-        user = ["\n".join(comp.get_name().split("_")) for comp in self.network_info.get_user_components()]
+        user = ["\n".join(comp.name.split("_")) for comp in self.network_info.user_components]
         user_g = nx.subgraph(g,user)
 
         # Create scrollbar with buttons for getting user components informations
@@ -141,7 +113,7 @@ class PrettyWidget(QWidget):
         caller_name = self.sender().text()
 
         for component in self.network_info.get_components():
-            if caller_name == component.get_name():
+            if caller_name == component.name:
                 # create_popup(component)
                 self.create_popout(component)
                 break
@@ -165,7 +137,7 @@ class popupWidget(QWidget):
         self.initUI()
 
     def initUI(self):
-        component_label = QLabel(self.component.get_name(), self)
+        component_label = QLabel(self.component.name, self)
         
         text = '''
         Component name: {}
@@ -174,7 +146,7 @@ class popupWidget(QWidget):
         Installed software on component: {}
         Accounts on component: {}
         Component domain: {}
-        '''.format(self.component.get_name(), "", "", "", "", "")
+        '''.format(self.component.name, "", "", "", "", "")
         
         font = self.font()
         font.setPointSize(10)
@@ -190,33 +162,39 @@ class popupWidget(QWidget):
 # For every connected component, add edge between those two components
 # Add component possition in the graph as coordinates X and Y
 # return created network graph
-def make_network(network_list):
+def make_network(network_list, possitions, height, width):
 
     gr = nx.DiGraph()
 
     for component in network_list.get_components():
         name = component.name
         rename = "\n".join(name.split("_"))
-        gr.add_node(rename, pos=koordinate[name])
+        gr.add_node(rename)
         connected = component.connected_components
         for connected_component in connected:
             connected_component = "\n".join(connected_component.split("_"))
             gr.add_edge(rename, connected_component, attr_dict = {'color' : "blue"})
         dic = {}
-        dic['X'], dic['Y'] = koordinate[name]
+        if possitions.get(component.name, "") == "":
+            dic['X'] = random.randint(1,height-1)
+            dic['Y'] = random.randint(1,width-1)
+        else:
+            x,y = possitions[component.name].split(",")
+            dic['X'] = int(x)
+            dic['Y'] = int(y)
         gr.nodes[rename].update(dic)
 
     return gr
 
 # vizualize network
-def vizualize(network1):
+def vizualize(network1, components_possitions):
 
     import sys
     suppress_qt_warnings()
     app = QApplication(sys.argv)
     app.aboutToQuit.connect(app.deleteLater)
     app.setStyle(QStyleFactory.create("gtk"))
-    screen = PrettyWidget(network1)
+    screen = PrettyWidget(network1, components_possitions)
     screen.show()
     sys.exit(app.exec_())
 

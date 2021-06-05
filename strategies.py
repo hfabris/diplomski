@@ -29,6 +29,9 @@ class Random():
 
     def chose_component(self, args):
         list_of_components = args[0]
+        # weights = []
+        # for component in list_of_components:
+            # if 
         return random.choice(list_of_components)
 
     def update_last_action(self, action):
@@ -40,7 +43,7 @@ class Random():
 # component is chosen greedy, chose the one with the highest priviledges
 class Greedy():
 
-    def __init__(actions):
+    def __init__(self, actions):
         self.actions = actions
         self.last_action = ""
 
@@ -55,11 +58,14 @@ class Greedy():
         if "account_discovery" in self.actions:
             actions_order.append("account_discovery")
         other_actions = [x for x in self.actions if x not in actions_order]
-        actions_order += random.shuffle(other_actions)
+        if other_actions != []:
+            random.shuffle(other_actions)
+            actions_order += other_actions
         return actions_order
 
     def chose_component(self, args):
         list_of_components = args[0]
+        return random.choice(list_of_components)
 
 
     def update_last_action(self, action):
@@ -74,8 +80,6 @@ class Finite_State_Machine():
     def __init__(self, actions):
         self.actions = []
 
-        if "initial_access" in actions:
-            self.actions.append("initial_access")
         if "escalate_priviledges" in actions:
             self.actions.append("escalate_priviledges")
         if "dump_credentials" in actions:
@@ -94,21 +98,20 @@ class Finite_State_Machine():
             if action not in self.actions:
                 self.actions.append(action)
 
-
-        self.last_action = ""
-
-    def chose_action(self):
-        last_index = self.actions.index(self.last_action)
-        return self.actions
+        self.last_action = self.actions[-1]
 
     def chose_component(self, args):
+        # last_index = self.actions.index(self.last_action)
         list_of_components = args[0]
+        return random.choice(list_of_components)
+
+    def chose_action(self):
 
         last_index = self.actions.index(self.last_action)
         if self.last_action == "lateral_movement" and "run_exploit" in self.actions:
             last_index += 1
 
-        return self.actions[last_index:] + self.actions[:last_index]
+        return self.actions[last_index+1:] + self.actions[:last_index+1]
 
     def update_last_action(self, action):
         self.last_action = action

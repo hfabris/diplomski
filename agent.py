@@ -8,7 +8,7 @@ class agent:
         try:
             self.name = name
             self.action_list = info["actions"]
-            
+
             self.strategy = getattr(strategies, info["strategy"])
             self.strategy = self.strategy(self.action_list)
             
@@ -19,7 +19,7 @@ class agent:
             print("Invalid agent {} description".format(name))
             exit()
 
-    def chose_action(self, network):
+    def chose_action(self):
         return self.strategy.chose_action()
 
     def execute_action(self, action_names, args):
@@ -30,8 +30,12 @@ class agent:
             action_return = action_call(self,args)
             if action_return == 1:
                 self.strategy.update_last_action(action_name)
-                # print("\nExecuted action {}".format(action_name))
+                # if self.name == "gray_agent":
+                    # print("Employee {} executed action {}".format(args[1].name, action_name))
+                # print("Executed action {}\n".format(action_name))
                 return 1
+            elif action_return == -1:
+                print("\n\n\nFailed to execute action {}\n\n\n".format(action_name))
                 
         return 0
 
@@ -44,15 +48,18 @@ class employee():
         self.name = info["name"]
         self.priviledge_level = info["priviledge_level"] 
         self.domain = info["domain"]
+        self.remote = info["remote"]
+
         self.active_connections = []
         self.unread_emails = []
-        self.remote = info["remote"]
+        self.active_logins = []
 
     def get_priviledge_level(self):
         return self.priviledge_level
 
     def add_connections(self, connection):
-        self.active_connections.append(connection.get_name())
+        self.active_connections.append(connection.name)
+
 
     def remove_connection(self, employee):
     
@@ -61,11 +68,20 @@ class employee():
             return 1
         return 0
 
+    def add_login(self, component):
+        self.active_logins.append(component)
+
+    def remove_login(self, component):
+        if component in self.active_logins:
+            del self.active_logins[self.active_logins.index(component)]
+            return 1
+        return 0
+
     def add_unread_email(self,sender):
         self.unread_emails.append(sender)
 
     def get_random_email(self):
-        if self.unread_emails != 0:
+        if self.unread_emails != []:
             random_email = random.choice(self.unread_emails)
             del self.unread_emails[self.unread_emails.index(random_email)]
             return random_email
@@ -106,7 +122,7 @@ class attacker(agent):
         self.compromise["escalated"] = []               # list of components attacker has escalated footholds on
         self.compromise["exploited"] = []               # list of components attacker has tried to exploit with exploits in his toolbox
 
-        self.current_component = None
+        # self.current_component = None
 
     def add_knowledge(self, category, new_knowledge):
         if new_knowledge not in self.knowledge[category]:
@@ -142,8 +158,8 @@ class attacker(agent):
     def is_exfiltrated(self, component):
         return component in self.compromise["exfiltrated"]
 
-    def set_current_component(self, component):
-        self.current_component = component
+    # def set_current_component(self, component):
+        # self.current_component = component
 
     def add_foothold(self, component):
         self.has_access = True
@@ -154,6 +170,11 @@ class attacker(agent):
             if foothold in self.compromise["footholds"]:
                 foothold_index = self.compromise["footholds"].index(foothold)
                 del self.compromise["footholds"][foothold_index]
+            if foothold in self.compromise["escalated"]:
+                escalated_index = self.compromise["escalated"].index(foothold)
+                del self.compromise["escalated"][escalated_index]
+        if len(self.compromise["footholds"]) == 0:
+            self.has_access == False
 
 
 

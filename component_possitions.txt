@@ -1,0 +1,40 @@
+{
+	"dimensions" : {
+		"height" : "1400",
+		"width" : "700"
+	},
+    "components" : {
+		"backup_server" : "100,100",
+		"private_web_server" : "100,200",
+		"database_server" : "100,300",
+		"domain_controler" : "100,400",
+		"datacenter_switch" : "300,300",
+		"core_router" : "600,300",
+		"dmz_switch" : "600,200",
+		"wan_switch" : "850,300",
+		"Zagreb_regional_branch_switch" : "850,200",
+		"Split_regional_branch_switch" : "1050,300",
+		"Rijeka_regional_branch_switch" : "1050,450",
+		"distribution_switch" : "600,400",
+		"access_switch_IT" : "400,500",
+		"access_switch_management" : "600,500",
+		"access_switch_accounting" : "800,500",
+		"dns_server" : "400,200",
+		"mail_server" : "400,100",
+		"public_web_server" : "600,100",
+		"Zagreb_bank_counters" : "850,100",
+		"Zagreb_regional_admin_workstation" : "1050,100",
+		"Zagreb_bank_officer_workstation" : "1050,200",
+		"Split_bank_counters" : "1350,200",
+		"Split_regional_admin_workstation" : "1350,300",
+		"Split_bank_officer_workstation" : "1350,400",
+		"Rijeka_bank_counters" : "1350,500",
+		"Rijeka_regional_admin_workstation" : "1350,600",
+		"Rijeka_bank_officer_workstation" : "1050,600",
+		"sec_op_workstation" : "200,500",
+		"admin_workstation" : "200,600",
+		"developer_workstation" : "400,600",
+		"manager_workstation" : "600,600",
+		"accountant_workstation" : "800,600"
+	}
+}

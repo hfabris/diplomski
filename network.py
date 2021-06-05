@@ -37,6 +37,7 @@ class user_component(component):
             self.worker_name = info["worker_name"]
             self.priviledge_level = info["priviledge_level"]
             self.domains = info["domain"]
+            self.remote = info["remote"]
             self.sensitive = info["sensitive"]
             self.user_component = True
 
@@ -48,10 +49,6 @@ class user_component(component):
         except:
             print("Invalid user component {} description".format(id))
 
-
-    def is_account_active(self, account):
-        if account in self.active_accounts: return True
-        return False
 
     # Method to put status of component
     # If the status is True, the component is active and the user is logged in
@@ -89,7 +86,7 @@ class user_component(component):
     
     def remove_active_connection(self, other_component, employee1, employee2):
         
-        active_connections = self.active_connections[other_component.get_name()]
+        active_connections = self.active_connections[other_component.name]
         
         if (employee1, employee2) in active_connections:
             del active_connections[active_connections.index((employee1, employee2))]
@@ -100,8 +97,13 @@ class user_component(component):
         else:
             return 0
         
-        self.active_connections[other_component.get_name()] = active_connections
+        self.active_connections[other_component.name] = active_connections
         return 1
+
+    def remove_attacker_connection(self, other_component):
+        active_connections = self.active_connections.get(other_component.name, "")
+        if active_connections != "":
+            self.active_connections[other_component.name] = []
 
     def is_vulnerable(self, exploit):
         if exploit in self.vulnerable:
@@ -118,7 +120,15 @@ class user_component(component):
             if current_comp.name not in visited: 
                 visited.add(current_comp.name)
                 if current_comp.user_component == True and current_comp.name != self.name:
-                    connected.add(current_comp.name)
+                    if current_comp.name in self.remote:
+                        connected.add(current_comp.name)
+                    else:    
+                        for domain in current_comp.domains:
+                            if domain in self.domains:
+                                connected.add(current_comp.name)
+                            # print("\n")
+                            # print(current_comp.name)
+                            # print(current_comp.domains, self.domains)
 
                 for component in current_comp.connected_components:
                     if component not in visited and component not in to_visit:
@@ -136,7 +146,33 @@ class user_component(component):
             if employee_name in self.administrators:
                 self.admin_accounts.append(employee)
 
-
+    def get_info(self):
+        # print(self.name)
+        # print(self.connected_components)
+        # print(self.admin_accounts)
+        # print(self.sensitive)
+        # print(self.software)
+        # print(self.active_accounts)
+        # print(self.active_connections)
+        connected = ", ".join(x for x in self.connected_components)
+        admins = ", ".join(x for x in self.admin_accounts)
+        sensitive = ", ".join(x for x in self.sensitive)
+        softwares = ", ".join(x for x in self.software)
+        active_accounts = ", ".join(x for x in self.active_accounts)
+        active_connections = ", ".join(x for x in self.active_connections)
+        info = '''
+Component name : {}
+Connected components: {}
+Component ip address: {}
+Component administrators : {}
+Sensitive informations on component : {}
+Installed software on component: {}
+Active accounts: {}
+Active connections : {}
+        '''.format(self.name, connected, self.ip_address, admins, sensitive, softwares, active_accounts, active_connections)
+        
+        
+        return info
 
 # class to make network model from components descriptions
 # network model consists of user and network components
