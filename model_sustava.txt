@@ -76,7 +76,7 @@
 						"System administrator",
 						"Security operator" 
 						],
-				"max_account_number" : "3",
+				"max_account_number" : "1",
 				"worker_name" : "System administrator",
 				"priviledge_level" : "2",
 				"domain" : [ "Central", "Admin" ],
@@ -98,7 +98,7 @@
 				"administrators"	:	[
 						"Security operator" 
 						],
-				"max_account_number" : "3",
+				"max_account_number" : "1",
 				"worker_name" : "Security operator",
 				"priviledge_level" : "3",
 				"domain" : [],
@@ -304,12 +304,11 @@
 						"Proprietary backup server rješenje koje koristi smb"
 						],
 				"administrators"	: [
-						"System administrator",
 						"Security operator"
 					],
 				"max_account_number" : "0",
 				"worker_name" : "",
-				"priviledge_level" : "",
+				"priviledge_level" : "0",
 				"domain" : [],
 				"remote" : [], 
 				"sensitive" : []
@@ -323,12 +322,11 @@
 						"Internet Information Services v8.5"
 					],
 				"administrators"	: [
-						"System administrator",
 						"Security operator"
 					],
 				"max_account_number" : "0",
 				"worker_name" : "",
-				"priviledge_level" : "",
+				"priviledge_level" : "0",
 				"domain" : [],
 				"remote" : [], 
 				"sensitive" : []
@@ -342,12 +340,11 @@
 						"SQL Server 2016"
 					],
 				"administrators"	: [
-						"System administrator",
 						"Security operator"
 					],
 				"max_account_number" : "0",
 				"worker_name" : "",
-				"priviledge_level" : "",
+				"priviledge_level" : "0",
 				"domain" : [],
 				"remote" : [], 
 				"sensitive" : []
@@ -361,12 +358,11 @@
 						"SQL server 2016"
 						],
 				"administrators"	: [
-						"System administrator",
 						"Security operator"
 					],
 				"max_account_number" : "0",
 				"worker_name" : "",
-				"priviledge_level" : "",
+				"priviledge_level" : "0",
 				"domain" : [],
 				"remote" : [], 
 				"sensitive" : []
@@ -386,7 +382,7 @@
 					],
 				"max_account_number" : "0",
 				"worker_name" : "",
-				"priviledge_level" : "",
+				"priviledge_level" : "0",
 				"domain" : [],
 				"remote" : [], 
 				"sensitive" : []
@@ -405,7 +401,7 @@
 					],
 				"max_account_number" : "0",
 				"worker_name" : "",
-				"priviledge_level" : "",
+				"priviledge_level" : "0",
 				"domain" : [],
 				"remote" : [], 
 				"sensitive" : []
@@ -418,10 +414,12 @@
 						"Operacijski sustav Red Hat Enterprise Linux v7.3",
 						"BIND 9"
 						],
-				"administrators"	: [],
+				"administrators"	: [
+						"Security operator"
+					],
 				"max_account_number" : "0",
 				"worker_name" : "",
-				"priviledge_level" : "",
+				"priviledge_level" : "0",
 				"domain" : [],
 				"remote" : [], 
 				"sensitive" : []

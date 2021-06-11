@@ -2,32 +2,33 @@
 	"gray_agent" :
 	{
 		"actions"	:	{
-			"reboot_host" : 1,
-			"user_login_to_host" : 1,
-			"open_connection_between_hosts" : 10,
-			"close_connection_between_hosts" : 1,
-			"open_email" : 1,
-			"send_email" : 1,
-			"browser_internet" : 1
+			"reboot_host" : 5,
+			"user_login_to_host" : 10,
+			"open_connection_between_hosts" : 25,
+			"close_connection_between_hosts" : 25,
+			"open_email" : 10,
+			"send_email" : 10,
+			"browser_internet" : 10,
+			"do_nothing" : 5
 			},
-		"strategy"	:	"Random",
+		"strategy"	:	["Random"],
 		"knowledge"	:	{},
 		"tools"	:	{}
 	},
 	"attacker" :
 	{
 		"actions"	:	{
-			"lateral_movement" : 1,
-			"dump_credentials" : 1,
-			"enumerate_host" : 1,
-			"exfiltrate_data" : 1,
-			"run_exploit" : 1,
-			"escalate_privileges" : 1,
-			"defense_evasion" : 1,
-			"account_discovery" : 1,
-			"initial_access" : 1
+			"lateral_movement" : 2,
+			"dump_credentials" : 2,
+			"enumerate_host" : 2,
+			"exfiltrate_data" : 2,
+			"run_exploit" : 2,
+			"escalate_priviledges" : 2,
+			"account_discovery" : 2,
+			"initial_access" : 2,
+			"do_nothing" : 1
 			},
-		"strategy"	:	"Random",
+		"strategy"	:	["Random", "Greedy" , "Finite_State_Machine"],
 		"knowledge"	:	{},
 		"tools"		:	{
 			"exploits" : {
@@ -41,9 +42,10 @@
 	"defender" :
 	{
 		"actions"	:	{
-			"check_opened_connections" : 1
+			"check_opened_connections" : 75,
+			"do_nothing" : 25
 			},
-		"strategy"	:	"Random",
+		"strategy"	:	["Random"],
 		"knowledge"	:	{},
 		"tools"		:	{
 			"admin password" : "Evfr2EWC"

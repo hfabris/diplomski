@@ -8,6 +8,7 @@ import graf
 import random
 
 import strategies
+import copy
 
 import time
 import statistics
@@ -36,14 +37,24 @@ def main():
     width = int(components_possitions["dimensions"]["width"])
     possitions = components_possitions["components"]
 
-    total_footholds = []
-    total_exfiltrated = []
-    total_enumerated = []
-    total_escalated = []
-
     current_time = time.time()
 
-    for j in range(0):
+    attacker_statistics = {}
+    attacker_progress = {}
+    for strategy in agents_list["attacker"]["strategy"]:
+        attacker_statistics[strategy] = {}
+        attacker_statistics[strategy]["total_footholds"] = []
+        attacker_statistics[strategy]["total_exfiltrated"] = []
+        attacker_statistics[strategy]["total_enumerated"] = []
+        attacker_statistics[strategy]["total_escalated"] = []
+
+        attacker_progress[strategy] = {}
+
+    number_of_rounds = []
+
+    for j in range(50):
+        
+        pre_game = []
 
         agents = {}
         for agent_name in agents_list:
@@ -54,29 +65,30 @@ def main():
         network_list.add_graph(graf.make_network(network_list, possitions, height, width))
 
         employees = {}
-        for user_component in system["user_components"]:
+        for user_component in network_list.user_components:
 
-            user_component = system["user_components"][user_component]
-            max_account_number = int(user_component["max_account_number"])
-            if max_account_number > 0:
-                account_number = random.randint(1, max_account_number)
+            account_number = user_component.account_number
+            if account_number > 0:
 
                 for i in range(1,account_number+1):
                     info = {}
-                    info["component"] = user_component["name"]
-                    info["name"] = user_component["worker_name"] + " " + str(i)
-                    info["priviledge_level"] = int(user_component["priviledge_level"])
-                    info["domain"] = user_component["domain"]
-                    info["remote"] = user_component["remote"]
+                    info["component"] = user_component.name + " " + str(i)
+                    info["name"] = user_component.worker_name + " " + str(i)
+                    info["priviledge_level"] = user_component.priviledge_level
+                    info["domain"] = user_component.domains
+                    info["remote"] = user_component.remote
                     employee = agent.employee(info)
                     employees[employee.name] = employee
 
 
         for component in network_list.user_components:
             if component.administrators != []:
-                component.add_administrator_accounts(employees)
+                if component.subcomponents != []:
+                    for subcomponent in component.subcomponents:
+                        subcomponent.add_administrator_accounts(employees)
+                else:
+                    component.add_administrator_accounts(employees)
         
-
         gray = agents["gray_agent"]
         attacker = agents["attacker"]
         defender = agents["defender"]
@@ -85,69 +97,217 @@ def main():
             for employee in employees:
                 employee = employees[employee]
                 action_list = gray.chose_action()
-                action_return = gray.execute_action(action_list, [network_list, employee, employees, agents])
-                # print("\nEmployee {}".format(employee.name))
+                exectuted_action = ""
+                other = ""
+                while True:
+                    action = action_list[0]
+                    del action_list[0]
+                    action_return = gray.execute_action(action, [network_list, employee, employees, agents])
+                    if type(action_return) != int:
+                        other = action_return[1]
+                        action_return = action_return[0]
+                        # print(action, other)
+                    if action_return == 1:
+                        exectuted_action = action
+                        break
+                    elif action_return == -1:
+                        print("\nProblem while executing action {}\n".format(action))
+                        break
+                    if action_list == []:
+                        print("\nAll actions tested, none executed\n")
+                        break
+                if exectuted_action != "" :
+                    pre_game.append( (employee.name, exectuted_action, other) )
 
             if attacker.has_access: break
-
+            exectuted_action = ""
             attacker_action = attacker.chose_action()
-            attacker.execute_action(attacker_action, [network_list, employee, employees, agents])
+            while True:
+                action = attacker_action[0]
+                del attacker_action[0]
+                action_return = attacker.execute_action(action, [network_list, None, employees, agents])
+                if type(action_return) != int:
+                    other = action_return[1]
+                    action_return = action_return[0]
+                if action_return == 1:
+                    exectuted_action = action
+                    break
+                elif action_return == -1:
+                    print("\nProblem while executing action {}\n".format(action))
+                    break
+                if attacker_action == []:
+                    print("\nAll actions tested, none executed\n")
+                    break
+            if exectuted_action != "":
+                pre_game.append( ("attacker", exectuted_action, other) )
 
-        # print(attacker.knowledge)
-        # print(attacker.compromise)
+        user_component_count = network_list.get_number_of_components()
+        number_of_rounds.append(user_component_count * 2)
+        # print("Round {} has {} components".format(j, user_component_count))
 
-        user_component_count = len(network_list.user_components)
-
+        emulation_data = {}
+        
         for i in range(user_component_count * 2):
+            round_actions = []
             for employee in employees:
                 employee = employees[employee]
                 
-                # print("\n{}".format(employee.name))
                 action_list = gray.chose_action()
-                action_return = gray.execute_action(action_list, [network_list, employee, employees, agents])
-                if action_return == 0:
-                    print("Nothing executed")
-            attacker_action = attacker.chose_action()
-            attacker.execute_action(attacker_action, [network_list, None, employees, agents])
+                exectuted_action = ""
+                while True:
+                    action = action_list[0]
+                    del action_list[0]
+                    action_return = gray.execute_action(action, [network_list, employee, employees, agents])
+                    if type(action_return) != int:
+                        other = action_return[1]
+                        action_return = action_return[0]
+                    if action_return == 1:
+                        exectuted_action = action
+                        break
+                    elif action_return == -1:
+                        print("\nProblem while executing action {}\n".format(action))
+                        break
+                    if action_list == []:
+                        print("\nAll actions tested, none executed\n")
+                        break
+            
+                if exectuted_action != "" :
+                    round_actions.append( (employee.name, exectuted_action, other) )
 
-            # defender_action = defender.chose_action()
-            # defender.execute_action(["check_opened_connections"], [network_list, None, employees, agents])
+            exectuted_action = ""
+            defender_action = defender.chose_action()
+            while True:
+                action = defender_action[0]
+                del defender_action[0]
+                action_return = defender.execute_action(action, [network_list, None, employees, agents])
+                if type(action_return) != int:
+                    other = action_return[1]
+                    action_return = action_return[0]
+                if action_return == 1:
+                    exectuted_action = action
+                    break
+                elif action_return == -1:
+                    print("\nProblem while executing action {}\n".format(action))
+                    break
+                if defender_action == []:
+                    print("\nAll actions tested, none executed\n")
+                    break
+                
+            if exectuted_action != "" :
+                round_actions.append( ("defender", exectuted_action, other) )
 
-        total_footholds.append(len(attacker.compromise["footholds"]))
-        total_exfiltrated.append(len(attacker.compromise["exfiltrated"]))
-        total_enumerated.append(len(attacker.compromise["enumerated"]))
-        total_escalated.append(len(attacker.compromise["escalated"]))
+            emulation_data[i] = round_actions
 
-    # print("Attacker strategy is {}".format(agents_list["attacker"]["strategy"]))
-    # print("Footholds: {}".format(total_footholds))
-    # print("\t mean : {} , median : {}\n".format(statistics.mean(total_footholds), statistics.median(total_footholds)))
-    # print("Exfiltrated: {}".format(total_exfiltrated))
-    # print("\t mean : {} , median : {}\n".format(statistics.mean(total_exfiltrated), statistics.median(total_exfiltrated)))
-    # print("Enumerated: {}".format(total_enumerated))
-    # print("\t mean : {} , median : {}\n".format(statistics.mean(total_enumerated), statistics.median(total_enumerated)))
-    # print("Escalated: {}".format(total_escalated))
-    # print("\t mean : {} , median : {}\n".format(statistics.mean(total_escalated), statistics.median(total_escalated)))
+        # Emulate the game
+        for attacker_strategy in attacker.strategies:
+            attacker.set_strategy(attacker_strategy)
+            
+            network_list.reset_all_components()
+            
+            for employee in employees:
+                employees[employee].reset_employee
+            
+            attacker.reset()
+            
+            for action in pre_game:
+                employee, action, optional = action
+                if employee != "attacker":
+                    employee = employees[employee]
+                    action_return = gray.execute_action(action, [network_list, employee, employees, agents], optional)
+                else:
+                    action_return = attacker.execute_action(action, [network_list, None, employees, agents], optional)
 
-    network_list = network.network_model(system)
+            
+            attacker_progress[attacker_strategy][j] = {}
+            attacker_progress[attacker_strategy][j][0] = {}
+            attacker_progress[attacker_strategy][j][0]["action"] = ("", "")
+            attacker_progress[attacker_strategy][j][0]["knowledge"] = copy.deepcopy(attacker.knowledge)
+            attacker_progress[attacker_strategy][j][0]["compromise"] = copy.deepcopy(attacker.compromise)
 
-    for component in network_list.user_components:
-        print(component.get_info())
+            for i in range(user_component_count * 2 ):
+                attacker_progress[attacker_strategy][j][i+1] = {}
+                attacker_progress[attacker_strategy][j][i+1]["action"] = {}
+                attacker_progress[attacker_strategy][j][i+1]["knowledge"] = {}
+                attacker_progress[attacker_strategy][j][i+1]["compromise"] = {}
 
-    # component_name = "accountant_workstation"
-    # component = network_list.get_component(component_name)
-    # print(component)
-    # print(component.name)
-    # print(component.get_connected_components(network_list))
+                round_actions = emulation_data[i]
+                defender_action = round_actions[-1]
+                del round_actions[-1]
+                
+                for employee, action, optional in round_actions:
+                    employee = employees[employee]
+                    action_return = gray.execute_action(action, [network_list, employee, employees, agents], optional)
+                    
+                attacker_action = attacker.chose_action()
+                while True:
+                    action = attacker_action[0]
+                    del attacker_action[0]
+                    action_return = attacker.execute_action(action, [network_list, None, employees, agents])
+                    if type(action_return) != int:
+                        other = action_return[1]
+                        action_return = action_return[0]
+                    if action_return == 1:
+                        exectuted_action = action
+                        attacker_progress[attacker_strategy][j][i+1]["action"] = ( action, other )
+                        # print("Attacker with strategy {} executed action {} in round {}\n".format(attacker_strategy, action, i))
+                        attacker.strategy.update_last_action(action)
+                        break
+                
+
+                action_return = defender.execute_action(defender_action[1], [network_list, None, employees, agents], defender_action[2])
+                
+                # Save attacker knowledge and compromise for analysis
+                attacker_progress[attacker_strategy][j][i+1]["knowledge"] = copy.deepcopy(attacker.knowledge)
+                attacker_progress[attacker_strategy][j][i+1]["compromise"] = copy.deepcopy(attacker.compromise)
+
+            attacker_statistics[attacker_strategy]["total_footholds"].append(len(attacker.compromise["footholds"]))
+            attacker_statistics[attacker_strategy]["total_exfiltrated"].append(len(attacker.compromise["exfiltrated"]))
+            attacker_statistics[attacker_strategy]["total_enumerated"].append(len(attacker.compromise["enumerated"]))
+            attacker_statistics[attacker_strategy]["total_escalated"].append(len(attacker.compromise["escalated"]))
+
+
+    
+
+    print("Total number of rounds:")
+    print(number_of_rounds)
+
+    for strategy in attacker_statistics:
+        
+        
+        total_footholds = attacker_statistics[strategy]["total_footholds"]
+        total_footholds_percent = [(x/y)*100 for x,y in zip(total_footholds, number_of_rounds)]
+
+        total_exfiltrated = attacker_statistics[strategy]["total_exfiltrated"]
+        total_exfiltrated_percent = [(x/y)*100 for x,y in zip(total_exfiltrated, number_of_rounds)]
+
+        total_enumerated = attacker_statistics[strategy]["total_enumerated"]
+        total_enumerated_percent = [(x/y)*100 for x,y in zip(total_enumerated, number_of_rounds)]
+
+        total_escalated = attacker_statistics[strategy]["total_escalated"]
+        total_escalated_percent = [(x/y)*100 for x,y in zip(total_escalated, number_of_rounds)]
+        
+        print("\n")
+        print("Attacker strategy is {}".format(strategy))
+        print("Footholds: {}".format(total_footholds))
+        print("\t max : {:.02f} % , min : {:.02f} % , mean : {:0.2f} % , median : {:0.2f} %\n".format(max(total_footholds_percent), min(total_footholds_percent), statistics.mean(total_footholds_percent), statistics.median(total_footholds_percent)))
+
+        print("Exfiltrated: {}".format(total_exfiltrated))
+        print("\t max : {:.02f} % , min : {:.02f} % , mean : {:0.2f} % , median : {:0.2f} %\n".format(max(total_exfiltrated_percent), min(total_exfiltrated_percent), statistics.mean(total_exfiltrated_percent), statistics.median(total_exfiltrated_percent)))
+
+        print("Enumerated: {}".format(total_enumerated))
+        print("\t max : {:.02f} % , min : {:.02f} % , mean : {:0.2f} % , median : {:0.2f} %\n".format(max(total_enumerated_percent), min(total_enumerated_percent), statistics.mean(total_enumerated_percent), statistics.median(total_enumerated_percent)))
+
+        print("Escalated: {}".format(total_escalated))
+        print("\t max : {:.02f} % , min : {:.02f} % , mean : {:0.2f} % , median : {:0.2f} %\n".format(max(total_escalated_percent), min(total_escalated_percent), statistics.mean(total_escalated_percent), statistics.median(total_escalated_percent)))
+
     
     
     new_time = time.time()
     diff_time = new_time - current_time
     print("Time to execute {}".format(diff_time))
-    
 
-
-    # network_list.add_graph(graf.make_network(network_list, possitions, height, width))
-    # graf.vizualize(network_list, components_possitions)
+    network_list.add_graph(graf.make_network(network_list, possitions, height, width))
+    graf.vizualize(network_list, components_possitions, attacker_progress)
 
 
 main()

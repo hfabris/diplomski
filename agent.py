@@ -9,9 +9,13 @@ class agent:
             self.name = name
             self.action_list = info["actions"]
 
-            self.strategy = getattr(strategies, info["strategy"])
-            self.strategy = self.strategy(self.action_list)
-            
+            self.strategies = {}
+            for strategy_name in info["strategy"]:
+                strategy = getattr(strategies, strategy_name)
+                self.strategies[strategy_name] = strategy(self.action_list)
+
+            self.strategy = random.choice(list(self.strategies.values()))
+
             self.knowledge = info["knowledge"]  # turn to dictionary
             self.tools = info["tools"]
 
@@ -22,23 +26,11 @@ class agent:
     def chose_action(self):
         return self.strategy.chose_action()
 
-    def execute_action(self, action_names, args):
+    def execute_action(self, action_name, args, optional=None):
 
-        for action_name in action_names:
-
-            action_call = getattr(action, action_name)
-            action_return = action_call(self,args)
-            if action_return == 1:
-                self.strategy.update_last_action(action_name)
-                # if self.name == "gray_agent":
-                    # print("Employee {} executed action {}".format(args[1].name, action_name))
-                # print("Executed action {}\n".format(action_name))
-                return 1
-            elif action_return == -1:
-                print("\n\n\nFailed to execute action {}\n\n\n".format(action_name))
-                
-        return 0
-
+        action_call = getattr(action, action_name)
+        action_return = action_call(self, args, optional)
+        return action_return
 
 
 class employee():
@@ -59,7 +51,6 @@ class employee():
 
     def add_connections(self, connection):
         self.active_connections.append(connection.name)
-
 
     def remove_connection(self, employee):
     
@@ -87,6 +78,12 @@ class employee():
             return random_email
         return ""
 
+    def get_email(self, sender):
+        if sender in self.unread_emails:
+            del self.unread_emails[self.unread_emails.index(sender)]
+            return sender
+        return ""
+
     def get_oldest_unread_email(self):
         if self.unread_emails != 0:
             oldest = self.unread_emails[0]
@@ -94,6 +91,10 @@ class employee():
             return oldest
         return ""
 
+    def reset_employee(self):
+        self.active_connections = []
+        self.unread_emails = []
+        self.active_logins = []
 
 class gray_agent(agent):
 
@@ -123,6 +124,14 @@ class attacker(agent):
         self.compromise["exploited"] = []               # list of components attacker has tried to exploit with exploits in his toolbox
 
         # self.current_component = None
+
+    def set_strategy(self, strategy_name):
+        self.strategy = self.strategies[strategy_name]
+
+    def get_strategy(self):
+        for strategy_name in self.strategies:
+            if self.strategy == self.strategies[strategy_name]:
+                return strategy_name
 
     def add_knowledge(self, category, new_knowledge):
         if new_knowledge not in self.knowledge[category]:
@@ -176,6 +185,22 @@ class attacker(agent):
         if len(self.compromise["footholds"]) == 0:
             self.has_access == False
 
+    def reset(self):
+        self.priviledge_level = {}
+        self.compromise = {}
+        self.has_access = False
+        
+        self.knowledge["credentials"] = []             
+        self.knowledge["connected"] = []                
+        self.knowledge["local_admins"] = []             
+        self.knowledge["active_connections"] = []       
+        self.knowledge["remote"] = []                   
+        self.compromise["footholds"] = []               
+        self.compromise["probed_accounts"] = []         
+        self.compromise["exfiltrated"] = []             
+        self.compromise["enumerated"] = []              
+        self.compromise["escalated"] = []               
+        self.compromise["exploited"] = [] 
 
 
 class defender(agent):

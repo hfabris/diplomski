@@ -8,6 +8,7 @@ import networkx as nx
 import json
 import network
 import random
+import time
 
 
 def suppress_qt_warnings():
@@ -18,13 +19,14 @@ def suppress_qt_warnings():
 
 class PrettyWidget(QWidget):
 
-    def __init__(self, network_info, components_possitions):
+    def __init__(self, network_info, components_possitions, attacker_progress):
 
 
         super(PrettyWidget, self).__init__()
         font = QFont()
         font.setPointSize(16)
         self.network_info = network_info
+        self.attacker_progress = attacker_progress
         
         self.height = int(components_possitions["dimensions"]["height"])
         self.width = int(components_possitions["dimensions"]["width"])
@@ -43,43 +45,249 @@ class PrettyWidget(QWidget):
         
         self.figure = plt.figure()
         self.canvas = FigureCanvas(self.figure)
-        grid.addWidget(self.canvas, 0, 2, 9, 9)
+        grid.addWidget(self.canvas, 1, 2, 8, 9)
 
         # Create network graph from network informations
-        g = make_network(self.network_info, self.possitions, self.height, self.width)
+        self.g = make_network(self.network_info, self.possitions, self.height, self.width)
 
-        self.network_info.add_graph(g)
-
-        # Make subgraph consisting of user components
-        user = ["\n".join(comp.name.split("_")) for comp in self.network_info.user_components]
-        user_g = nx.subgraph(g,user)
+        self.network_info.add_graph(self.g)
 
         # Create scrollbar with buttons for getting user components informations
         # Add scrollbar to the left side of the grid
-        self.createVerticalGroupBox(user)
+        user = ["\n".join(comp.name.split("_")) for comp in self.network_info.user_components]
+        self.create_component_group_box(user)
         buttonLayout = QVBoxLayout()
         buttonLayout.addWidget(self.verticalGroupBox)
+
+        # self.create_legend_group_box()
+        # buttonLayout.addLayout(self.legend_layout)
+        
         grid.addLayout(buttonLayout, 0, 0, 6, 2)
 
+        self.create_legend_group_box()
+        grid.addLayout(self.legend_layout, 6, 0, 2,2)
 
-        # Plot network
-        node_pos = {node[0]: (node[1]['X'], -node[1]['Y']) for node in g.nodes(data=True)}
-        edge_col = [e[2]['attr_dict']['color'] for e in g.edges(data=True)]
-        nx.draw_networkx(g, pos=node_pos, edge_color=edge_col, node_size=500, alpha=.99, node_color='red',
-                         with_labels=True, bbox=dict(facecolor="skyblue", edgecolor='black', boxstyle='round,pad=0.2'), node_shape='h' )
-        nx.draw_networkx(user_g, pos=node_pos, edge_color=edge_col, node_size=100, alpha=.99, node_color='blue',
-                         with_labels=True, bbox=dict(facecolor="r", edgecolor='black', boxstyle='round,pad=0.2'), node_shape='s' )
-        labels = nx.get_edge_attributes(g, 'num_connections')
-        plt.title('Network', size=15)
-        plt.axis("off")
+        self.create_upper_bar()
+        grid.addLayout(self.horizontal_layout, 0, 2, 1, 7)
+
+
+        # user = ["\n".join(comp.name.split("_")) for comp in self.network_info.user_components]
+        # self.create_component_group_box(user)
+        # buttonLayout = QVBoxLayout()
+        # buttonLayout.addWidget(self.verticalGroupBox)
+        # grid.addLayout(buttonLayout, 0, 0, 6, 2)
+
+        # self.create_upper_bar()
+        # grid.addLayout(self.horizontal_layout, 0, 2, 1, 1)
+
+
 
         self.showMaximized()
 
-        self.canvas.draw_idle()
+    def create_upper_bar(self):
+        self.horizontal_layout = QGridLayout()
+        font = QFont()
+        font.setBold(True)
+
+        strategy_layout = QHBoxLayout()
+
+        strategy_label = QLabel()
+        strategy_label.setFont(font)
+        strategy_label.setText("\tSelect attacker strategy: ")
+        strategy_layout.addWidget(strategy_label)
+
+        strategy_combo = QComboBox(self)
+        for strategy in self.attacker_progress:
+            strategy_combo.addItem(strategy)
+            game = self.attacker_progress[strategy]
+        strategy_layout.addWidget(strategy_combo)
+
+        self.horizontal_layout.addLayout(strategy_layout, 0, 0)
+
+        game_layout = QHBoxLayout()
+
+        game_label = QLabel()
+        game_label.setFont(font)
+        game_label.setText("\tSelect attacker game: ")
+        game_layout.addWidget(game_label)
+
+        game_combo = QComboBox(self)
+        for i in game:
+            game_combo.addItem(str(i))
+            round = game[i]
+        game_layout.addWidget(game_combo)
+
+        self.horizontal_layout.addLayout(game_layout, 0, 1)
+
+        round_layout = QHBoxLayout()
+        
+        round_label = QLabel()
+        round_label.setFont(font)
+        round_label.setText("\tSelect attacker round: ")
+        round_layout.addWidget(round_label)
+
+        strategy = strategy_combo.currentText()
+        game = int(game_combo.currentText())
+        round_combo = QComboBox(self)
+        for round in self.attacker_progress[strategy][game]: 
+            round_combo.addItem(str(round))
+        round_combo.activated.connect(lambda: self.show_round(strategy_combo.currentText(), int(game_combo.currentText()), int(round_combo.currentText())))
+        round_layout.addWidget(round_combo)
+
+        game_combo.activated.connect(lambda: self.refresh_round(strategy_combo.currentText(), int(game_combo.currentText()), round_combo))
+
+        self.horizontal_layout.addLayout(round_layout, 0, 2)
+
+        emulate_button = QPushButton("Emulate")
+        self.horizontal_layout.addWidget(emulate_button, 0, 3)
+        emulate_button.clicked.connect(lambda: self.emulate(strategy_combo.currentText(), int(game_combo.currentText())))
+        
+        exit_button = QPushButton("Exit")
+        self.horizontal_layout.addWidget(exit_button, 0 ,4)
+        exit_button.clicked.connect(lambda:self.close())
+
+        self.show_round(strategy_combo.currentText(), int(game_combo.currentText()), int(round_combo.currentText()))
+
+    def create_legend_group_box(self):
+        
+        self.legend_layout = QVBoxLayout()
+        
+        colors = [ "skyblue", "red", "green", "yellow", "cyan", "gray"]
+        texts = [ "network components", "user componnets", "attacker has foothold on component", "attacker enumerated component",
+            "attacker has escalated priviledges on component", "attacker has exfiltrated data from component"]
+        
+        combinations = zip(colors, texts)
+        
+        layout = QGridLayout()
+        
+        font = QFont()
+        font.setBold(True)
+        
+        text_label = QLabel()
+        text_label.setAlignment(Qt.AlignCenter)
+        text_label.setFont(font)
+        text_label.setText("colour")
+        layout.addWidget(text_label, 0, 0)
+
+        text_label = QLabel()
+        text_label.setAlignment(Qt.AlignCenter)
+        text_label.setFont(font)
+        text_label.setText("colour meaning")
+        layout.addWidget(text_label, 0, 1)
+        
+        for color, text in zip(colors, texts):
+            
+            i = colors.index(color)
+            
+            color_label = QLabel()
+            color_label.setAlignment(Qt.AlignCenter)
+            color_label.setAutoFillBackground(True)
+            palette = QPalette()
+            palette.setColor(QPalette.Background, QColor(color))
+            color_label.setPalette(palette)
+            color_label.setText(color)
+            layout.addWidget(color_label, i+1, 0)
+            
+            text_label = QLabel()
+            text_label.setAlignment(Qt.AlignCenter)
+            text_label.setWordWrap(True)
+            text_label.setText(text)
+            layout.addWidget(text_label, i+1, 1)
+            
+        self.legend_layout.addLayout(layout)
+
+        
+        text_label = QLabel()
+        text_label.setAlignment(Qt.AlignCenter)
+        text_label.setFont(font)
+        text_label.setText("Attacker action: ")
+        self.legend_layout.addWidget(text_label)
+
+        self.attacker_action = QLabel()
+        self.attacker_action.setAlignment(Qt.AlignCenter)
+        self.attacker_action.setFont(font)
+        self.attacker_action.setText(" ")
+        self.legend_layout.addWidget(self.attacker_action)
+
+
+    def emulate(self, strategy, game):
+        
+        rounds = int(list(self.attacker_progress[strategy][game].keys())[-1])
+
+        for round in range(10):
+            # print(round)
+            self.show_round(strategy, game, round)
+            time.sleep(1)
+
+    def refresh_round(self, strategy, game, widget):
+
+        widget.clear()
+
+        for round in self.attacker_progress[strategy][game]: 
+            widget.addItem(str(round))
+
+
+    def show_round(self, strategy, game, round):
+        # print("Selected strategy is {}, game {}, round {}".format(strategy, game, round))
+        game = int(game)        
+
+        user = ["\n".join(comp.name.split("_")) for comp in self.network_info.user_components]
+        user_g = nx.subgraph(self.g,user)
+
+        action, knowledge, compromise = self.attacker_progress[strategy][game][round].values()
+
+        self.attacker_action.setText("Round: " + str(round) + "\naction: " + action[0] + " on component " + action[1])
+        self.attacker_action.setWordWrap(True)
+
+        footholds = set([x.name.split(" ")[0] for x in compromise["footholds"]])
+        footholds = ["\n".join(x.split("_")) for x in footholds]
+        footholds_subgraph = nx.subgraph(self.g, footholds)
+
+        enumerated = set([x.name.split(" ")[0] for x in compromise["enumerated"]])
+        enumerated = ["\n".join(x.split("_")) for x in enumerated]
+        enumerated_subgraph = nx.subgraph(self.g, enumerated)
+
+        escalated = set([x.name.split(" ")[0] for x in compromise["escalated"]])
+        escalated = ["\n".join(x.split("_")) for x in escalated]
+        escalated_subgraph = nx.subgraph(self.g, escalated)
+
+        exfiltrated = set([x.name.split(" ")[0] for x in compromise["exfiltrated"]])
+        exfiltrated = ["\n".join(x.split("_")) for x in exfiltrated]
+        exfiltrated_subgraph = nx.subgraph(self.g, exfiltrated)
+
+        # Plot network
+        node_pos = {node[0]: (node[1]['X'], -node[1]['Y']) for node in self.g.nodes(data=True)}
+        edge_col = [e[2]['attr_dict']['color'] for e in self.g.edges(data=True)]
+
+        nx.draw_networkx(self.g, pos=node_pos, edge_color=edge_col, node_size=500, alpha=.99, node_color="r",
+                         with_labels=True, bbox=dict(facecolor="skyblue", edgecolor='black', boxstyle='round,pad=0.35'), node_shape='s' )
+
+        nx.draw_networkx(user_g, pos=node_pos, edge_color=edge_col, node_size=100, alpha=.99, node_color='blue',
+                         with_labels=True, bbox=dict(facecolor="r", edgecolor='black', boxstyle='round,pad=0.35'), node_shape='s' )
+
+        nx.draw_networkx(footholds_subgraph, pos=node_pos, edge_color=edge_col, node_size=100, alpha=.99, node_color='green',
+                         with_labels=True, bbox=dict(facecolor="g", edgecolor='black', boxstyle='round,pad=0.35'), node_shape='s' )
+
+        nx.draw_networkx(escalated_subgraph, pos=node_pos, edge_color=edge_col, node_size=100, alpha=.99, node_color='green',
+                         with_labels=True, bbox=dict(facecolor="cyan", edgecolor='black', boxstyle='round,pad=0.35'), node_shape='s' )
+
+        nx.draw_networkx(enumerated_subgraph, pos=node_pos, edge_color=edge_col, node_size=100, alpha=.99, node_color='green',
+                         with_labels=True, bbox=dict(facecolor="yellow", edgecolor='black', boxstyle='round,pad=0.35'), node_shape='s' )
+
+        nx.draw_networkx(exfiltrated_subgraph, pos=node_pos, edge_color=edge_col, node_size=100, alpha=.99, node_color='green',
+                         with_labels=True, bbox=dict(facecolor="gray", edgecolor='black', boxstyle='round,pad=0.35'), node_shape='s' )
+
+        labels = nx.get_edge_attributes(self.g, 'num_connections')
+        plt.title('Network', size=15)
+        plt.axis("off")
+        
+        self.canvas.draw()
+        self.canvas.flush_events()
+
 
     # Create new scrollbar, at the top of the scrollbar add label to describe the actions
     # For every node in graph, add button to get informations about that node
-    def createVerticalGroupBox(self,graph):        
+    def create_component_group_box(self,graph):        
         scrolllayout = QVBoxLayout()
         
         info_label = QLabel()
@@ -137,16 +345,12 @@ class popupWidget(QWidget):
         self.initUI()
 
     def initUI(self):
-        component_label = QLabel(self.component.name, self)
+        layout = QScrollArea(self)
+        layout.setWidgetResizable(True)
+
+        component_label = QLabel(self.component.name)
         
-        text = '''
-        Component name: {}
-        Connected components: {}
-        Component ip address: {}
-        Installed software on component: {}
-        Accounts on component: {}
-        Component domain: {}
-        '''.format(self.component.name, "", "", "", "", "")
+        text = self.component.get_info()
         
         font = self.font()
         font.setPointSize(10)
@@ -154,6 +358,10 @@ class popupWidget(QWidget):
         component_label.setText(text)
         component_label.setStyleSheet("padding :15px")
         component_label.adjustSize()
+
+        layout.setMinimumWidth(component_label.width())
+        layout.setMinimumHeight(component_label.height())
+        layout.setWidget(component_label)
 
 
 
@@ -187,14 +395,14 @@ def make_network(network_list, possitions, height, width):
     return gr
 
 # vizualize network
-def vizualize(network1, components_possitions):
+def vizualize(network1, components_possitions, attacker_progress):
 
     import sys
     suppress_qt_warnings()
     app = QApplication(sys.argv)
     app.aboutToQuit.connect(app.deleteLater)
     app.setStyle(QStyleFactory.create("gtk"))
-    screen = PrettyWidget(network1, components_possitions)
+    screen = PrettyWidget(network1, components_possitions, attacker_progress)
     screen.show()
     sys.exit(app.exec_())
 
